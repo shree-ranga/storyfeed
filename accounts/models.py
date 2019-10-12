@@ -17,7 +17,6 @@ class Profile(models.Model):
     followers = models.ManyToManyField(
         "self", symmetrical=False, related_name="following", through="Follow"
     )
-    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -27,11 +26,16 @@ class Profile(models.Model):
 # Through table for followers in profile
 class Follow(models.Model):
     following_user = models.ForeignKey(
-        "Profile", related_name="follower_user", on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL, related_name="follower_user", on_delete=models.CASCADE
     )
     follower_user = models.ForeignKey(
-        "Profile", related_name="following_user", on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL,
+        related_name="following_user",
+        on_delete=models.CASCADE,
     )
+
+    class Meta:
+        unique_together = ("following_user", "follower_user")
 
     def __str__(self):
         return f"{self.follower_user} following {self.following_user}"
