@@ -15,6 +15,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+# Custom user model
+AUTH_USER_MODEL = "accounts.User"
 
 # Application definition
 
@@ -28,6 +30,8 @@ INSTALLED_APPS = [
     # third party
     "rest_framework",
     "rest_framework.authtoken",
+    # local
+    "accounts",
 ]
 
 MIDDLEWARE = [
