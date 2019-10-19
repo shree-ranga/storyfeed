@@ -18,13 +18,17 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ["username", "full_name", "email", "password"]
         extra_kwargs = {"password": {"write_only": True}}
 
-    def create(self, validated_data):
-        full_name = validated_data.pop("full_name")
+    def to_internal_value(self, data):
+        ret = super().to_internal_value(data)
+        full_name = ret.pop("full_name")
         split_name = full_name.rsplit(None, 1)
         first_name = split_name[0]
         last_name = split_name[1]
-        validated_data["first_name"] = first_name
-        validated_data["last_name"] = last_name
+        ret["first_name"] = first_name
+        ret["last_name"] = last_name
+        return ret
+
+    def create(self, validated_data):
         return User.objects.create_user(**validated_data)
 
 
