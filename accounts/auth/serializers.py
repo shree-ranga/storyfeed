@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model, authenticate
+from django.db.models import Q
 
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -11,7 +12,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         validators=[UniqueValidator(queryset=User.objects.all())]
     )
-    full_name = serializers.CharField(required=True)
+    full_name = serializers.CharField()
 
     class Meta:
         model = User
@@ -33,8 +34,32 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(required=False)
-    email = serializers.EmailField(required=False)
+    username = serializers.CharField(required=False, allow_blank=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    password = serializers.CharField()
+
+    class Meta:
+        fields = ["username", "email", "password"]
+        extra_kwargs = {"password": {"write_only": True}}
+
+    def validate(self, data):
+        username = data.get("username", None)
+        email = data.get("email", None)
+        password = data.get("password")
+
+        if not email and not username:
+            msg = "Username/Email required."
+            raise ValidationError(msg)
+
+        user_obj = User.objects.filter(Q(email=email) | Q(username=username))[0]
+
+        user = authenticate(username=user_obj, password=password)
+        if user is not None:
+            data["user"] = user
+        else:
+            msg = "Invalid Username/Email or Password."
+            raise ValidationError(msg)
+        return data
 
 
 class LogoutSerializer(serializers.Serializer):
