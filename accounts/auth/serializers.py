@@ -53,7 +53,7 @@ class LoginSerializer(serializers.Serializer):
 
         user_obj = User.objects.filter(Q(email=email) | Q(username=username))[0]
 
-        user = authenticate(username=user_obj, password=password)
+        user = authenticate(username=user_obj.username, password=password)
         if user is not None:
             data["user"] = user
         else:

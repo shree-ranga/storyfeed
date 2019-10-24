@@ -37,3 +37,10 @@ class LoginAPI(APIView):
                 {"token": token.key, "id": user.id}, status=status.HTTP_200_OK
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LogoutAPI(APIView):
+    def delete(self, request, *args, **kwargs):
+        token = Token.objects.get(user=request.user)
+        token.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
