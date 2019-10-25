@@ -23,10 +23,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         ret = super().to_internal_value(data)
         full_name = ret.pop("full_name")
         split_name = full_name.rsplit(None, 1)
-        first_name = split_name[0]
-        last_name = split_name[1]
-        ret["first_name"] = first_name
-        ret["last_name"] = last_name
+        ret["first_name"] = split_name[0]
+        ret["last_name"] = split_name[1]
         return ret
 
     def create(self, validated_data):

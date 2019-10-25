@@ -45,7 +45,7 @@ ipython_config.py
 
 # playground
 playground.py
-play
+play/
 
 # media
-media
+media/
