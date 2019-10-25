@@ -6,6 +6,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
 
 from .serializers import LoginSerializer, LogoutSerializer, RegisterSerializer
+from accounts.models import Profile
 
 
 class RegisterAPI(APIView):
@@ -17,6 +18,9 @@ class RegisterAPI(APIView):
         if serializer.is_valid():
             serializer.save()
             user = serializer.instance
+            # create profile for new user
+            Profile.objects.create(user=user)
+            # generate token for new user
             token = Token.objects.create(user=user)
             return Response(
                 {"token": token.key, "id": user.id}, status=status.HTTP_201_CREATED

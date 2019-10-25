@@ -26,12 +26,10 @@ class Profile(models.Model):
 # Through table for followers in profile
 class Follow(models.Model):
     following_user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name="follower_user", on_delete=models.CASCADE
+        Profile, related_name="follower_user", on_delete=models.CASCADE
     )
     follower_user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        related_name="following_user",
-        on_delete=models.CASCADE,
+        Profile, related_name="following_user", on_delete=models.CASCADE
     )
 
     class Meta:
