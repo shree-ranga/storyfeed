@@ -3,13 +3,13 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
-# API = "api/v1/"
+api_v1 = "api/v1/"
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("dummy/", include("play.urls")),
-    path("accounts/", include("accounts.urls")),
-    path("accounts/auth/", include("accounts.auth.urls")),
+    path(api_v1 + "dummy/", include("play.urls")),
+    path(api_v1 + "accounts/", include("accounts.urls")),
+    path(api_v1 + "accounts/auth/", include("accounts.auth.urls")),
 ]
 
 if settings.DEBUG:
