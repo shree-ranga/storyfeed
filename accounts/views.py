@@ -10,7 +10,9 @@ from .serializers import (
     UserListSerializer,
     UserDetailSerializer,
     ProfileAvatarSerializer,
+    FollowSerializer,
 )
+from .models import Follow
 
 User = get_user_model()
 
@@ -47,3 +49,56 @@ class UploadProfileAvatarAPI(APIView):
                 {"msg": "Upload successful.."}, status=status.HTTP_201_CREATED
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FollowUnfollowAPI(APIView):
+    # follow
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        follower_user_id = request.user.id
+        following_user_id = data.get("following_user_id")
+        follow_data = {
+            "follower_user": follower_user_id,
+            "following_user": following_user_id,
+        }
+        serializer = FollowSerializer(data=follow_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # unfollow
+    def delete(self, request, *args, **kwargs):
+        query_params = request.query_params
+        follower_user_id = request.user.id
+        following_user_id = query_params.get("following_user_id")
+        instance = Follow.objects.get(
+            follower_user_id=follower_user_id, following_user_id=following_user_id
+        )
+        if instance:
+            instance.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            {"error": "Following user instance does not exist"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+class CheckFollowedAPI(APIView):
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        follower_user_id = request.user.id
+        following_user_id = data.get("following_user_id")
+        if Follow.objects.filter(
+            follower_user_id=follower_user_id, following_user_id=following_user_id
+        ).exists():
+            return Response({"following": True}, status=status.HTTP_200_OK)
+        return Response({"following": False}, status=status.HTTP_200_OK)
+
+
+class UserFollowersListAPI(APIView):
+    pass
+
+
+class UserFollowingListAPI(APIView):
+    pass
