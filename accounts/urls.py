@@ -6,6 +6,8 @@ from .views import (
     UploadProfileAvatarAPI,
     FollowUnfollowAPI,
     CheckFollowedAPI,
+    UserFollowersListAPI,
+    UserFollowingListAPI,
 )
 
 urlpatterns = [
@@ -20,4 +22,14 @@ urlpatterns = [
         name="user_follow_unfollow",
     ),
     path("users/check_followed/", CheckFollowedAPI.as_view(), name="check_followed"),
+    path(
+        "users/<int:pk>/followers/",
+        UserFollowersListAPI.as_view(),
+        name="user_followers",
+    ),
+    path(
+        "users/<int:pk>/following/",
+        UserFollowingListAPI.as_view(),
+        name="user_following",
+    ),
 ]

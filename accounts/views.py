@@ -97,8 +97,48 @@ class CheckFollowedAPI(APIView):
 
 
 class UserFollowersListAPI(APIView):
-    pass
+    def get_object(self, pk):
+        try:
+            user = User.objects.get(pk=pk)
+            return user
+        except:
+            raise ValidationError("User object does not exist")
+
+    def get_queryset(self, pk):
+        user = self.get_object(pk=pk)
+        followers_ids = list(user.profile.followers.all().values_list(flat=True))
+        followers = User.objects.filter(pk__in=followers_ids)
+        return followers
+
+    def get(self, request, pk=None, *args, **kwargs):
+        if pk is not None:
+            queryset = self.get_queryset(pk)
+            serializer = UserListSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            {"error": "Could not fetch followers"}, status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 class UserFollowingListAPI(APIView):
-    pass
+    def get_object(self, pk):
+        try:
+            user = User.objects.get(pk=pk)
+            return user
+        except:
+            raise ValidationError("User object does not exist")
+
+    def get_queryset(self, pk):
+        user = self.get_object(pk=pk)
+        following_ids = list(user.profile.following.all().values_list(flat=True))
+        following = User.objects.filter(pk__in=following_ids)
+        return following
+
+    def get(self, request, pk=None, *args, **kwargs):
+        if pk is not None:
+            queryset = self.get_queryset(pk)
+            serializer = UserListSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            {"error": "Could not fetch followers"}, status=status.HTTP_400_BAD_REQUEST
+        )

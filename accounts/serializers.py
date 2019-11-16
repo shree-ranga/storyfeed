@@ -13,6 +13,19 @@ class ProfileAvatarSerializer(serializers.ModelSerializer):
         fields = ["avatar"]
 
 
+class UserListSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+    profile = ProfileAvatarSerializer(required=False, many=False)
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "full_name", "profile"]
+        read_only_fields = ["id"]
+
+    def get_full_name(self, obj):
+        return str(obj.first_name + " " + obj.last_name)
+
+
 class ProfileDetailSerializer(serializers.ModelSerializer):
     total_followers = serializers.SerializerMethodField()
     total_following = serializers.SerializerMethodField()
@@ -31,19 +44,6 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
 class UserDetailSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
     profile = ProfileDetailSerializer(required=False, many=False)
-
-    class Meta:
-        model = User
-        fields = ["id", "username", "full_name", "profile"]
-        read_only_fields = ["id"]
-
-    def get_full_name(self, obj):
-        return str(obj.first_name + " " + obj.last_name)
-
-
-class UserListSerializer(serializers.ModelSerializer):
-    full_name = serializers.SerializerMethodField()
-    profile = ProfileAvatarSerializer(required=False, many=False)
 
     class Meta:
         model = User
