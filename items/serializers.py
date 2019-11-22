@@ -5,10 +5,17 @@ from .models import Item, Like
 from accounts.serializers import UserListSerializer
 
 
-class ItemSerializer(serializers.ModelSerializer):
+class ItemCreateSerializer(serializers.ModelSerializer):
     user = UserListSerializer(required=False)
 
     class Meta:
         model = Item
-        fields = "__all__"
+        fields = ("id", "user", "item", "caption")
         read_only_fields = ("id", "user")
+
+
+class ItemListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Item
+        fields = ("id", "item")
+        read_only_fields = ("id",)

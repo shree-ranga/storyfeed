@@ -4,17 +4,17 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 
 from .models import Item
-from .serializers import ItemSerializer
+from .serializers import ItemCreateSerializer, ItemListSerializer
 
 
-class PostCreateView(APIView):
+class ItemCreateView(APIView):
     def post(self, request, *args, **kwargs):
         item = request.data.get("item")
         caption = request.data.get("caption", None)
         data = {"item": item}
         if caption is not None:
             data["caption"] = caption
-        serializer = ItemSerializer(data=data)
+        serializer = ItemCreateSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(
@@ -23,6 +23,13 @@ class PostCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class PostListView(APIView):
+class ItemListView(APIView):
     def get(self, request, *args, **kwargs):
-        return Response({"msg": "list_post"}, status=status.HTTP_200_OK)
+        user_id = request.query_params.get("uid", None)
+        if user_id is not None:
+            queryset = Item.objects.filter(user=user_id)
+            serializer = ItemListSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            {"error": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST
+        )
