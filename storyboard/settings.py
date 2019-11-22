@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     # local
     "accounts",
+    "items",
     "play",
 ]
 
