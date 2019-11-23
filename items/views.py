@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 
 from .models import Item
-from .serializers import ItemCreateSerializer, ItemListSerializer
+from .serializers import ItemCreateSerializer, ItemListSerializer, ItemDetailSerializer
 
 
 class ItemCreateView(APIView):
@@ -33,3 +33,14 @@ class ItemListView(APIView):
         return Response(
             {"error": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST
         )
+
+
+class UserFeedView(APIView):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        user_id = user.id
+        following_ids = list(user.profile.following.all().values_list(flat=True))
+        following_ids.append(user_id)
+        queryset = Item.objects.filter(user__in=following_ids)
+        serializer = ItemDetailSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

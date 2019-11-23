@@ -19,3 +19,20 @@ class ItemListSerializer(serializers.ModelSerializer):
         model = Item
         fields = ("id", "item")
         read_only_fields = ("id",)
+
+
+class ItemDetailSerializer(serializers.ModelSerializer):
+    user = UserListSerializer()
+
+    class Meta:
+        model = Item
+        fields = (
+            "id",
+            "user",
+            "item",
+            "caption",
+            "created_at",
+            "likes_count",
+            "comments_count",
+        )
+        read_only_fields = ("id", "user")
