@@ -9,8 +9,6 @@ class Item(models.Model):
     )
     item = models.ImageField(null=True, blank=True)
     caption = models.TextField(max_length=150, null=True, blank=True)
-    likes_count = models.PositiveIntegerField(default=0)
-    comments_count = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
