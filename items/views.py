@@ -74,8 +74,8 @@ class UnlikeView(APIView):
 
 
 class CheckLike(APIView):
-    def post(self, request, *args, **kwargs):
-        item_id = request.data.get("post_id")
+    def get(self, request, *args, **kwargs):
+        item_id = request.query_params.get("post_id")
         user_id = request.user.id
         if Like.objects.filter(item=item_id, user=user_id).exists():
             return Response({"liked": True}, status=status.HTTP_200_OK)
