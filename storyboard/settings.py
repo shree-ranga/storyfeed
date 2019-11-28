@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     # local
     "accounts",
     "items",
-    "play",
+    "comments",
 ]
 
 MIDDLEWARE = [

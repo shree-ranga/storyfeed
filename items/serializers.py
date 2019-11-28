@@ -12,15 +12,15 @@ class ItemCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ("id", "user", "item", "caption")
-        read_only_fields = ("id",)
+        fields = ["id", "user", "item", "caption"]
+        read_only_fields = ["id"]
 
 
 class ItemListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
-        fields = ("id", "item")
-        read_only_fields = ("id",)
+        fields = ["id", "item"]
+        read_only_fields = ["id"]
 
 
 class ItemDetailSerializer(serializers.ModelSerializer):
@@ -33,13 +33,13 @@ class ItemDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ("id", "user", "item", "caption", "created_at", "likes_count")
-        read_only_fields = ("id", "user")
+        fields = ["id", "user", "item", "caption", "created_at", "likes_count"]
+        read_only_fields = ["id", "user"]
 
 
 class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
-        fields = ("id", "item", "user")
-        read_only_fields = ("id", "user")
+        fields = ["id", "item", "user"]
+        read_only_fields = ["id", "user"]
 
