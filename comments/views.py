@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 
 from .models import Comment
-from .serializers import CommentSerializer
+from .serializers import CommentCreateSerializer, CommentListSerializer
 
 
 class CommentCreateView(APIView):
@@ -12,9 +12,25 @@ class CommentCreateView(APIView):
         item_id = request.data.get("post_id")
         comment = request.data.get("comment")
         data = {"comment": comment, "item": item_id}
-        serializer = CommentSerializer(data=data)
+        serializer = CommentCreateSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class CommentListView(APIView):
+    def get_queryset(self, id):
+        queryset = Comment.objects.filter(item__id=id)
+        if queryset.exists():
+            return queryset
+        else:
+            return None
+
+    def get(self, request, *args, **kwargs):
+        item_id = request.query_params.get("post_id")
+        queryset = self.get_queryset(id=item_id)
+        if queryset:
+            serializer = CommentListSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)

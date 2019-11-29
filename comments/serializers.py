@@ -5,7 +5,7 @@ from accounts.serializers import UserListSerializer
 from .models import Comment
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class CommentCreateSerializer(serializers.ModelSerializer):
     user = UserListSerializer(required=False)
 
     class Meta:
@@ -13,3 +13,9 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ["id", "comment", "user", "item"]
         read_only_fields = ["id"]
 
+class CommentListSerializer(serializers.ModelSerializer):
+    user = UserListSerializer()
+    class Meta:
+        model = Comment
+        fields = ["id", "comment", "user"]
+        read_only_fields = ["id", "user"]
