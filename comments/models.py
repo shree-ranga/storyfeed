@@ -1,7 +1,9 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
 
 from items.models import Item
+from notifications.models import Notification
 
 
 class Comment(models.Model):
@@ -12,6 +14,7 @@ class Comment(models.Model):
     item = models.ForeignKey(
         Item, on_delete=models.CASCADE, related_name="item_comments"
     )
+    notifications = GenericRelation(Notification)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

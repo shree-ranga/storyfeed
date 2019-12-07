@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.contenttypes.fields import GenericRelation
 from django.conf import settings
 
+from notifications.models import Notification
 
 class User(AbstractUser):
     def __str__(self):
@@ -31,6 +33,7 @@ class Follow(models.Model):
     follower_user = models.ForeignKey(
         Profile, related_name="following_user", on_delete=models.CASCADE
     )
+    notifications = GenericRelation(Notification)
 
     class Meta:
         unique_together = ("following_user", "follower_user")

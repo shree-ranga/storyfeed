@@ -13,6 +13,7 @@ from .serializers import (
     FollowSerializer,
 )
 from .models import Follow
+from notifications.models import Notification
 
 User = get_user_model()
 
@@ -64,6 +65,12 @@ class FollowUnfollowAPI(APIView):
         serializer = FollowSerializer(data=follow_data)
         if serializer.is_valid():
             serializer.save()
+            notification = Notification.objects.create(
+                receiver=serializer.instance.following_user.user,
+                sender=serializer.instance.follower_user.user,
+                content_object=serializer.instance,
+                notification_type="follow",
+            )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

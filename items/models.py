@@ -1,5 +1,8 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
+
+from notifications.models import Notification
 
 
 class Item(models.Model):
@@ -9,6 +12,7 @@ class Item(models.Model):
     )
     item = models.ImageField(null=True, blank=True)
     caption = models.TextField(max_length=150, null=True, blank=True)
+    notifications = GenericRelation(Notification)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -24,6 +28,7 @@ class Like(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="liked_by"
     )
+    notifications = GenericRelation(Notification)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

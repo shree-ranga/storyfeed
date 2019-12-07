@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     # local
+    "notifications",
     "accounts",
     "items",
     "comments",
@@ -80,9 +81,9 @@ WSGI_APPLICATION = "storyboard.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "storyboard",
-        "USER": "myusername",
-        "PASSWORD": "mypassword",
+        "NAME": "storyboard_db",
+        "USER": "shree",
+        "PASSWORD": "shree123",
         "HOST": "127.0.0.1",
         "PORT": "5432",
     }

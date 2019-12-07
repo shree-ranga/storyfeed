@@ -13,9 +13,18 @@ class CommentCreateSerializer(serializers.ModelSerializer):
         fields = ["id", "comment", "user", "item"]
         read_only_fields = ["id"]
 
+
 class CommentListSerializer(serializers.ModelSerializer):
     user = UserListSerializer()
+
     class Meta:
         model = Comment
         fields = ["id", "comment", "user"]
         read_only_fields = ["id", "user"]
+
+
+class CommentNotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ["id", "comment"]
+        read_only_fields = ["id", "comment"]

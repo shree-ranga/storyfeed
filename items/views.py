@@ -12,6 +12,7 @@ from .serializers import (
     ItemDetailSerializer,
     LikeSerializer,
 )
+from notifications.models import Notification
 
 
 class ItemCreateView(APIView):
@@ -60,6 +61,12 @@ class LikeView(APIView):
         serializer = LikeSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)
+            notification = Notification.objects.create(
+                sender=serializer.instance.user,
+                receiver=serializer.instance.item.user,
+                content_object=serializer.instance,
+                notification_type="like",
+            )
             return Response({"msg": "Like created..."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

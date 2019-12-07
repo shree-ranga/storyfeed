@@ -54,8 +54,24 @@ class UserDetailSerializer(serializers.ModelSerializer):
         return str(obj.first_name + " " + obj.last_name)
 
 
+class UserNotificationSerializer(serializers.ModelSerializer):
+    profile = ProfileAvatarSerializer()
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "profile"]
+        read_only_fields = ["id", "username", "profile"]
+
+
 class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
         fields = ["id", "following_user", "follower_user"]
         read_only_fields = ["id"]
+
+
+class FollowNotificationSerialzier(serializers.ModelSerializer):
+    class Meta:
+        model = Follow
+        fields = ["id", "following_user"]
+        read_only_fields = ["id", "following_user"]
