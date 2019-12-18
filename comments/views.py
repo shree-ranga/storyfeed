@@ -16,7 +16,7 @@ class CommentCreateView(APIView):
         serializer = CommentCreateSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)
-            if serializer.instance.user is not serializer.instance.item.user:
+            if serializer.instance.user != serializer.instance.item.user:
                 notification = Notification.objects.create(
                     sender=serializer.instance.user,
                     receiver=serializer.instance.item.user,

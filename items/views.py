@@ -61,7 +61,7 @@ class LikeView(APIView):
         serializer = LikeSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)
-            if serializer.instance.user is not serializer.instance.item.user:
+            if serializer.instance.user != serializer.instance.item.user:
                 notification = Notification.objects.create(
                     sender=serializer.instance.user,
                     receiver=serializer.instance.item.user,
@@ -88,3 +88,14 @@ class CheckLike(APIView):
         if Like.objects.filter(item=item_id, user=user_id).exists():
             return Response({"liked": True}, status=status.HTTP_200_OK)
         return Response({"liked": False}, status=status.HTTP_200_OK)
+
+
+class LikedItemView(APIView):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        user_liked_items_id = list(
+            user.liked_by.all().values_list("item_id", flat=True)
+        )
+        liked_items = Item.objects.filter(id__in=user_liked_items_id)
+        serializer = ItemListSerializer(liked_items, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
