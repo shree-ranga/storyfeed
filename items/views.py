@@ -1,4 +1,5 @@
 from django.db.models import F
+from django.contrib.auth import get_user_model
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -13,6 +14,8 @@ from .serializers import (
     LikeSerializer,
 )
 from notifications.models import Notification
+
+User = get_user_model()
 
 
 class ItemCreateView(APIView):
@@ -92,7 +95,8 @@ class CheckLike(APIView):
 
 class LikedItemView(APIView):
     def get(self, request, *args, **kwargs):
-        user = request.user
+        user_id = request.query_params.get("uid")
+        user = User.objects.get(id=user_id)
         user_liked_items_id = list(
             user.liked_by.all().values_list("item_id", flat=True)
         )
