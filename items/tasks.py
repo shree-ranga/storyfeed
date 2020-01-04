@@ -1,6 +1,11 @@
-from storyboard.celery import celery_app as app
+from celery import shared_task
+
+from items.models import Item
 
 
-@app.task(bind=True)
-def add_task(x, y):
-    return x + y
+@shared_task
+def delete_after_expiration(item_id):
+    try:
+        Item.objects.get(id=item_id).delete()
+    except Item.ObjectDoesNotExist:
+        pass

@@ -12,19 +12,38 @@ from .serializers import (
     ItemDetailSerializer,
     LikeSerializer,
 )
+from .tasks import delete_after_expiration
 from notifications.models import Notification
+from datetime import timedelta
 
 
 class ItemCreateView(APIView):
     def post(self, request, *args, **kwargs):
         item = request.data.get("item")
         caption = request.data.get("caption", None)
+        expiration_time = request.data.pop("expiration_time")
         data = {"item": item}
         if caption is not None:
             data["caption"] = caption
         serializer = ItemCreateSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)
+            print(expiration_time)
+            if expiration_time[0] == "1 day":
+                delete_after_expiration.apply_async(
+                    args=(serializer.instance.id,),
+                    eta=serializer.instance.created_at + timedelta(seconds=2),
+                )
+            elif expiration_time[0] == "1 week":
+                delete_after_expiration.apply_async(
+                    args=(serializer.instance.id,),
+                    eta=serializer.instance.created_at + timedelta(seconds=5),
+                )
+            elif expiration_time[0] == "1 year":
+                delete_after_expiration.apply_async(
+                    args=(serializer.instance.id,),
+                    eta=serializer.instance.created_at + timedelta(seconds=10),
+                )
             return Response(
                 {"msg": "Upload item successful..."}, status=status.HTTP_201_CREATED
             )
@@ -44,7 +63,7 @@ class ItemListView(APIView):
 
 
 class ItemDeleteView(APIView):
-    # delete method when user would like to delete before expiration
+    # delete method when user'd like to delete before expiration
     def delete(self, request, *args, **kwargs):
         pass
 
