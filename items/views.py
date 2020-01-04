@@ -1,5 +1,4 @@
 from django.db.models import F
-from django.contrib.auth import get_user_model
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -14,8 +13,6 @@ from .serializers import (
     LikeSerializer,
 )
 from notifications.models import Notification
-
-User = get_user_model()
 
 
 class ItemCreateView(APIView):
@@ -44,6 +41,12 @@ class ItemListView(APIView):
         return Response(
             {"error": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST
         )
+
+
+class ItemDeleteView(APIView):
+    # delete method when user would like to delete before expiration
+    def delete(self, request, *args, **kwargs):
+        pass
 
 
 class UserFeedView(APIView):
@@ -96,9 +99,8 @@ class CheckLike(APIView):
 class LikedItemView(APIView):
     def get(self, request, *args, **kwargs):
         user_id = request.query_params.get("uid")
-        user = User.objects.get(id=user_id)
         user_liked_items_id = list(
-            user.liked_by.all().values_list("item_id", flat=True)
+            Like.objects.filter(user=user_id).values_list("item_id", flat=True)
         )
         liked_items = Item.objects.filter(id__in=user_liked_items_id)
         serializer = ItemListSerializer(liked_items, many=True)
