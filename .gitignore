@@ -49,3 +49,6 @@ play/
 
 # media
 media/
+
+# apns certificate
+pushcert.pem

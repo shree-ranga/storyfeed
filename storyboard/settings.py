@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     # third party
     "rest_framework",
     "rest_framework.authtoken",
+    "push_notifications",
     # local
     "notifications",
     "accounts",
@@ -139,3 +140,11 @@ REST_FRAMEWORK = {
 CELERY_BROKER_URL = "amqp://localhost:5672"
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
+
+# APNs settings
+PUSH_NOTIFICATIONS_SETTINGS = {
+    "APNS_CERTIFICATE": os.path.join(BASE_DIR + "/pushcert.pem"),
+    "APNS_TOPIC": "com.storyboard.storyboard",
+    "APNS_USE_ALTERNATIVE_PORT": True,
+    "UPDATE_ON_DUPLICATE_REG_ID": True,
+}
