@@ -12,8 +12,11 @@ from .serializers import (
     ItemDetailSerializer,
     LikeSerializer,
 )
+
+from notifications.serializers import NotificationSerializer
+
 from .tasks import delete_after_expiration
-from notifications.models import Notification
+
 from datetime import timedelta
 
 
@@ -28,7 +31,6 @@ class ItemCreateView(APIView):
         serializer = ItemCreateSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)
-            print(expiration_time)
             if expiration_time[0] == "1 day":
                 delete_after_expiration.apply_async(
                     args=(serializer.instance.id,),
@@ -87,12 +89,17 @@ class LikeView(APIView):
         if serializer.is_valid():
             serializer.save(user=request.user)
             if serializer.instance.user != serializer.instance.item.user:
-                notification = Notification.objects.create(
-                    sender=serializer.instance.user,
-                    receiver=serializer.instance.item.user,
-                    content_object=serializer.instance,
-                    notification_type="like",
-                )
+                notification_data = {
+                    "receiver": serializer.instance.item.user.id,
+                    "sender": serializer.instance.user.id,
+                    "content_object": serializer.instance,
+                    "notification_type": "like",
+                }
+                notification_serializer = NotificationSerializer(data=notification_data)
+                if notification_serializer.is_valid():
+                    notification_serializer.save()
+                else:
+                    return "Could not save notification object"
             return Response({"msg": "Like created..."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

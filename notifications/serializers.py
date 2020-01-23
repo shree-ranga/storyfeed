@@ -1,3 +1,5 @@
+from django.contrib.contenttypes.models import ContentType
+
 from rest_framework import serializers
 
 from .models import Notification
@@ -24,8 +26,18 @@ class NotifiedObjectRelatedField(serializers.RelatedField):
             raise Exception("Unexpected content object")
         return serializer.data
 
+    def to_internal_value(self, value):
+        if isinstance(value, Follow):
+            return value
+        elif isinstance(value, Like):
+            return value
+        elif isinstance(value, Comment):
+            return value
+        else:
+            raise Exception("Unexpected content object")
 
-class NotificationSerializer(serializers.ModelSerializer):
+
+class NotificationListSerializer(serializers.ModelSerializer):
     content_object = NotifiedObjectRelatedField(read_only=True)
     sender = UserNotificationSerializer(required=False)
 
@@ -33,3 +45,11 @@ class NotificationSerializer(serializers.ModelSerializer):
         model = Notification
         fields = ["id", "sender", "content_object", "notification_type", "created_at"]
         read_only_fields = ["id", "sender"]
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    content_object = NotifiedObjectRelatedField(queryset=ContentType.objects.all())
+
+    class Meta:
+        model = Notification
+        fields = ["sender", "receiver", "content_object", "notification_type"]
