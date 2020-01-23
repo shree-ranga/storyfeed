@@ -13,6 +13,7 @@ from .serializers import (
     FollowSerializer,
 )
 from .models import Follow
+from .tasks import send_follow_push_notification
 
 from notifications.serializers import NotificationSerializer
 
@@ -63,6 +64,7 @@ class FollowUnfollowAPI(APIView):
             "follower_user": follower_user_id,
             "following_user": following_user_id,
         }
+        device_id = data.get("device_id")
         serializer = FollowSerializer(data=follow_data)
         if serializer.is_valid():
             serializer.save()
@@ -75,6 +77,12 @@ class FollowUnfollowAPI(APIView):
             notification_serializer = NotificationSerializer(data=notification_data)
             if notification_serializer.is_valid():
                 notification_serializer.save()
+                # send push notification here
+                send_follow_push_notification.delay(
+                    receiver_id=notification_serializer.instance.receiver_id,
+                    device_id=device_id,
+                    sender_id=notification_serializer.instance.sender_id,
+                )
             else:
                 return "Could not save notification object"
             return Response(serializer.data, status=status.HTTP_201_CREATED)
