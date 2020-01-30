@@ -1,3 +1,5 @@
+from django.contrib.auth import get_user_model
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,6 +9,20 @@ from rest_framework.authtoken.models import Token
 
 from .serializers import LoginSerializer, LogoutSerializer, RegisterSerializer
 from accounts.models import Profile
+
+User = get_user_model()
+
+
+class CheckUserExistsAPI(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        username = request.query_params["username"]
+        check_user_exists = User.objects.filter(username=username).exists()
+        if check_user_exists:
+            return Response({"exists": True}, status=status.HTTP_200_OK)
+        else:
+            return Response({"exists": False}, status=status.HTTP_200_OK)
 
 
 class RegisterAPI(APIView):
