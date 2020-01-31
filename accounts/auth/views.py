@@ -25,6 +25,18 @@ class CheckUserExistsAPI(APIView):
             return Response({"exists": False}, status=status.HTTP_200_OK)
 
 
+class CheckEmailExistsAPI(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        email = request.query_params["email"]
+        check_email_exists = User.objects.filter(email=email).exists()
+        if check_email_exists:
+            return Response({"exists": True}, status=status.HTTP_200_OK)
+        else:
+            return Response({"exists": False}, status=status.HTTP_200_OK)
+
+
 class RegisterAPI(APIView):
     permission_classes = [AllowAny]
 
