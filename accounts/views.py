@@ -5,6 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
+from rest_framework.filters import SearchFilter
+from rest_framework import generics
 
 from .serializers import (
     UserListSerializer,
@@ -20,11 +22,23 @@ from notifications.serializers import NotificationSerializer
 User = get_user_model()
 
 
-class UserListAPI(APIView):
-    def get(self, request, *args, **kwargs):
-        queryset = User.objects.all()
-        serializer = UserListSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+class UserListAPI(generics.ListAPIView):
+    queryset = User.objects.all()
+    # serializer_class = UserListSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ["username", "first_name", "last_name"]
+
+    def get_serializer(self, *args, **kwargs):  # ListAPIView is calling get_serializer
+        serializer_class = self.get_serializer_class()
+        return serializer_class(*args, **kwargs)
+
+    def get_serializer_class(self):
+        return UserListSerializer
+
+    # def get(self, request, *args, **kwargs):
+    #     queryset = User.objects.all()
+    #     serializer = UserListSerializer(queryset, many=True)
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserDetailAPI(APIView):
