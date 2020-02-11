@@ -52,22 +52,22 @@ class ItemCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ItemListView(APIView):
-    def get(self, request, *args, **kwargs):
-        user_id = request.query_params.get("uid", None)
-        if user_id is not None:
-            queryset = Item.objects.filter(user=user_id)
-            serializer = ItemListSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(
-            {"error": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST
-        )
-
-
 class ItemDeleteView(APIView):
     # delete method when user'd like to delete before expiration
     def delete(self, request, *args, **kwargs):
         pass
+
+
+class UserItemListDetailView(APIView):
+    def get(self, request, *args, **kwargs):
+        user_id = request.query_params.get("uid", None)
+        if user_id is not None:
+            queryset = Item.objects.filter(user=user_id)
+            serializer = ItemDetailSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            {"error": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 class UserFeedView(APIView):
@@ -81,7 +81,7 @@ class UserFeedView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class LikeView(APIView):
+class LikeItemView(APIView):
     def post(self, request, *args, **kwargs):
         item_id = request.data.get("post_id")
         data = {"item": item_id}
@@ -104,7 +104,7 @@ class LikeView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UnlikeView(APIView):
+class UnlikeItemView(APIView):
     def post(self, request, *args, **kwargs):
         item_id = request.data.get("post_id")
         user_id = request.user.id
@@ -113,7 +113,7 @@ class UnlikeView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CheckLike(APIView):
+class CheckItemLikeView(APIView):
     def get(self, request, *args, **kwargs):
         item_id = request.query_params.get("post_id")
         user_id = request.user.id
@@ -121,13 +121,3 @@ class CheckLike(APIView):
             return Response({"liked": True}, status=status.HTTP_200_OK)
         return Response({"liked": False}, status=status.HTTP_200_OK)
 
-
-class LikedItemView(APIView):
-    def get(self, request, *args, **kwargs):
-        user_id = request.query_params.get("uid")
-        user_liked_items_id = list(
-            Like.objects.filter(user=user_id).values_list("item_id", flat=True)
-        )
-        liked_items = Item.objects.filter(id__in=user_liked_items_id)
-        serializer = ItemListSerializer(liked_items, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
