@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "accounts",
     "items",
     "comments",
+    "play",  # dummy for testing
 ]
 
 MIDDLEWARE = [
@@ -128,7 +129,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/api/v1/media/"
 
 
-# Djangorestframework
+# DRF
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication"
@@ -147,4 +148,5 @@ PUSH_NOTIFICATIONS_SETTINGS = {
     "APNS_TOPIC": "com.storyboard.storyboard",
     "APNS_USE_ALTERNATIVE_PORT": True,
     "UPDATE_ON_DUPLICATE_REG_ID": True,
+    "UNIQUE_REG_ID": True,
 }

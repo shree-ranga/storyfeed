@@ -13,6 +13,7 @@ from .serializers import (
     UserDetailSerializer,
     ProfileAvatarSerializer,
     FollowSerializer,
+    EditUserSerializer,
 )
 from .models import Follow
 from .tasks import send_follow_push_notification
@@ -34,11 +35,6 @@ class UserListAPI(generics.ListAPIView):
 
     def get_serializer_class(self):
         return UserListSerializer
-
-    # def get(self, request, *args, **kwargs):
-    #     queryset = User.objects.all()
-    #     serializer = UserListSerializer(queryset, many=True)
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserDetailAPI(APIView):
@@ -68,17 +64,32 @@ class UploadProfileAvatarAPI(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class FollowUnfollowAPI(APIView):
+class EditUserView(APIView):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        serialiazer = EditUserSerializer(user)
+        return Response(serialiazer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, *args, **kwargs):
+        data = request.data
+        print(data)
+        serializer = EditUserSerializer(request.user, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserFollowUnfollowAPI(APIView):
     # follow
     def post(self, request, *args, **kwargs):
         data = request.data
         follower_user_id = request.user.id
         following_user_id = data.get("following_user_id")
-        follow_data = {
-            "follower_user": follower_user_id,
-            "following_user": following_user_id,
-        }
         device_id = data.get("device_id")
+        follow_data = {}
+        follow_data["follower_user"] = follower_user_id
+        follow_data["following_user"] = following_user_id
         serializer = FollowSerializer(data=follow_data)
         if serializer.is_valid():
             serializer.save()
@@ -91,7 +102,6 @@ class FollowUnfollowAPI(APIView):
             notification_serializer = NotificationSerializer(data=notification_data)
             if notification_serializer.is_valid():
                 notification_serializer.save()
-                # send push notification here
                 send_follow_push_notification.delay(
                     receiver_id=notification_serializer.instance.receiver_id,
                     device_id=device_id,
@@ -120,8 +130,8 @@ class FollowUnfollowAPI(APIView):
 
 
 class CheckFollowedAPI(APIView):
-    def post(self, request, *args, **kwargs):
-        data = request.data
+    def get(self, request, *args, **kwargs):
+        data = request.query_params
         follower_user_id = request.user.id
         following_user_id = data.get("following_user_id")
         if Follow.objects.filter(

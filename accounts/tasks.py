@@ -11,19 +11,9 @@ User = get_user_model()
 def send_follow_push_notification(receiver_id, sender_id, device_id):
     try:
         device = APNSDevice.objects.get(user=receiver_id, device_id=device_id)
-    except:
-        APNSDevice.ObjectDoesNotExist
+    except APNSDevice.DoesNotExist:
+        return "APNSDevice matching query does not exist"
 
-    try:
-        receiver = User.objects.get(id=receiver_id)
-    except:
-        User.ObjectDoesNotExist
-
-    try:
-        sender = User.objects.get(id=sender_id)
-    except:
-        User.ObjectDoesNotExist
-
-    msg = f"{sender.username} stared following you!"
-
+    sender = User.objects.get(id=sender_id)
+    msg = f"{sender.username} ({sender.first_name} {sender.last_name}) stared following you!"
     device.send_message(msg)

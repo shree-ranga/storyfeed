@@ -7,7 +7,7 @@ api_v1 = "api/v1/"
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path(api_v1 + "dummy/", include("play.urls")),
+    path("dummy/", include("play.urls")),
     path(api_v1 + "accounts/", include("accounts.urls")),
     path(api_v1 + "accounts/auth/", include("accounts.auth.urls")),
     path(api_v1 + "items/", include("items.urls")),

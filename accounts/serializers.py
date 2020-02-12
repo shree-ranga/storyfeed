@@ -23,7 +23,7 @@ class UserListSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
     def get_full_name(self, obj):
-        return str(obj.first_name + " " + obj.last_name)
+        return f"{obj.first_name} {obj.last_name}"
 
 
 class ProfileDetailSerializer(serializers.ModelSerializer):
@@ -44,11 +44,41 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
 class UserDetailSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
     profile = ProfileDetailSerializer(required=False, many=False)
-    update_full_name = serializers.CharField(required=False)
 
     class Meta:
         model = User
-        fields = ["id", "username", "full_name", "profile", "update_full_name"]
+        fields = ["id", "username", "full_name", "profile"]
+        read_only_fields = ["id"]
+
+    def get_full_name(self, obj):
+        return f"{obj.first_name} {obj.last_name}"
+
+
+class EditProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ["avatar", "bio"]
+
+
+class EditUserSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+    update_full_name = serializers.CharField(required=False)
+    bio = serializers.CharField(required=False)
+    profile = EditProfileSerializer(read_only=True)
+    avatar = serializers.ImageField(required=False)
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "full_name",
+            "bio",
+            "profile",
+            "avatar",
+            "email",
+            "update_full_name",
+        ]
         read_only_fields = ["id"]
         extra_kwargs = {"username": {"required": False}}
 
@@ -62,20 +92,18 @@ class UserDetailSerializer(serializers.ModelSerializer):
         return ret
 
     def update(self, instance, validated_data):
-        profile_data = validated_data.pop("profile", None)
         instance.username = validated_data.get("username", instance.username)
         instance.first_name = validated_data.get("first_name", instance.first_name)
         instance.last_name = validated_data.get("last_name", instance.last_name)
-        if profile_data:
-            profile = Profile.objects.get(user=instance)
-            profile.bio = profile_data.get("bio", profile.bio)
-            profile.save()
-            instance.profile = profile
+        instance.email = validated_data.get("email", instance.email)
+        instance.profile.bio = validated_data.get("bio", instance.profile.bio)
+        instance.profile.avatar = validated_data.get("avatar", instance.profile.avatar)
+        instance.profile.save()
         instance.save()
         return instance
 
     def get_full_name(self, obj):
-        return str(obj.first_name + " " + obj.last_name)
+        return f"{obj.first_name} {obj.last_name}"
 
 
 class UserNotificationSerializer(serializers.ModelSerializer):
