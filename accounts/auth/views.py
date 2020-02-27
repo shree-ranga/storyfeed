@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -13,6 +14,7 @@ from accounts.models import Profile
 User = get_user_model()
 
 
+# needs caching
 class CheckUserExistsAPI(APIView):
     permission_classes = [AllowAny]
 
@@ -25,6 +27,7 @@ class CheckUserExistsAPI(APIView):
             return Response({"exists": False}, status=status.HTTP_200_OK)
 
 
+# needs caching
 class CheckEmailExistsAPI(APIView):
     permission_classes = [AllowAny]
 
@@ -72,7 +75,11 @@ class LoginAPI(APIView):
 
 
 class LogoutAPI(APIView):
+    def get_object(self, user):
+        return get_object_or_404(Token, user=user)
+
     def delete(self, request, *args, **kwargs):
-        token = Token.objects.get(user=request.user)
+        # token = Token.objects.get(user=request.user)
+        token = self.get_object(request.user)
         token.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

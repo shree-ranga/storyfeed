@@ -52,3 +52,9 @@ media/
 
 # apns certificate
 pushcert.pem
+
+# local gunicorn
+gunicorn.conf.py
+
+# local nginx
+storyboard_nginx.conf

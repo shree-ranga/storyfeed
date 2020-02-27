@@ -7,7 +7,7 @@ from rest_framework.exceptions import ValidationError
 
 User = get_user_model()
 
-
+# create profile here instead of views
 class RegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         validators=[UniqueValidator(queryset=User.objects.all())]
@@ -45,13 +45,9 @@ class LoginSerializer(serializers.Serializer):
         email = data.get("email", None)
         password = data.get("password")
 
-        if not email and not username:
-            msg = "Username/Email required."
-            raise ValidationError(msg)
-
         user_obj = User.objects.filter(Q(email=email) | Q(username=username))[0]
-
         user = authenticate(username=user_obj.username, password=password)
+
         if user is not None:
             data["user"] = user
         else:

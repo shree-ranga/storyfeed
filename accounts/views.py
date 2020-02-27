@@ -24,6 +24,7 @@ User = get_user_model()
 
 
 class UserListAPI(generics.ListAPIView):
+    # def get_queryset()
     queryset = User.objects.all()
     # serializer_class = UserListSerializer
     filter_backends = [SearchFilter]
@@ -72,7 +73,6 @@ class EditUserView(APIView):
 
     def put(self, request, *args, **kwargs):
         data = request.data
-        print(data)
         serializer = EditUserSerializer(request.user, data=data)
         if serializer.is_valid():
             serializer.save()
