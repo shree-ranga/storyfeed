@@ -31,13 +31,12 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "push_notifications",
-    "rest_framework_swagger",
+    # "storages",
     # local
     "notifications",
     "accounts",
     "items",
     "comments",
-    "play",  # dummy for testing
 ]
 
 MIDDLEWARE = [
@@ -161,3 +160,10 @@ PUSH_NOTIFICATIONS_SETTINGS = {
     "UPDATE_ON_DUPLICATE_REG_ID": True,
     "UNIQUE_REG_ID": True,
 }
+
+# AWS S3
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+AWS_STORAGE_BUCKET_NAME = "storyfeed-remote-s3-test"
+AWS_DEFAULT_ACL = None
+AWS_S3_FILE_OVERWRITE = False
+AWS_LOCATION = "media"
