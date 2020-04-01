@@ -1,6 +1,7 @@
 from django.db.models import F
 
 from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
@@ -12,6 +13,7 @@ from .serializers import (
     ItemDetailSerializer,
     LikeSerializer,
 )
+from .pagination import UserItemListPagination
 
 from notifications.serializers import NotificationSerializer
 
@@ -23,11 +25,8 @@ from datetime import timedelta
 class ItemCreateView(APIView):
     def post(self, request, *args, **kwargs):
         item = request.data.get("item")
-        caption = request.data.get("caption", None)
         expiration_time = request.data.pop("expiration_time")
         data = {"item": item}
-        if caption is not None:
-            data["caption"] = caption
         serializer = ItemCreateSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)
@@ -52,22 +51,29 @@ class ItemCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ItemDeleteView(APIView):
-    # delete method when user'd like to delete before expiration
-    def delete(self, request, *args, **kwargs):
-        pass
+# TODO: - refactor. Change query params to args
+class UserItemListDetailView(generics.ListAPIView):
+    pagination_class = UserItemListPagination
+
+    def get_queryset(self):
+        user_id = self.request.query_params.get("uid", None)
+        if user_id:
+            filtered_items = Item.objects.filter(user=user_id)
+        return filtered_items
+
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        return serializer_class(*args, **kwargs)
+
+    def get_serializer_class(self):
+        return ItemDetailSerializer
 
 
-class UserItemListDetailView(APIView):
+class AllItemsView(APIView):
     def get(self, request, *args, **kwargs):
-        user_id = request.query_params.get("uid", None)
-        if user_id is not None:
-            queryset = Item.objects.filter(user=user_id)
-            serializer = ItemDetailSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(
-            {"error": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST
-        )
+        queryset = Item.objects.all()
+        serializer = ItemListSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserFeedView(APIView):
@@ -121,3 +127,8 @@ class CheckItemLikeView(APIView):
             return Response({"liked": True}, status=status.HTTP_200_OK)
         return Response({"liked": False}, status=status.HTTP_200_OK)
 
+
+class ItemDeleteView(APIView):
+    # delete method when user'd like to delete before expiration
+    def delete(self, request, *args, **kwargs):
+        pass

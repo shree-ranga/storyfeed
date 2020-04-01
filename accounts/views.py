@@ -8,6 +8,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.filters import SearchFilter
 from rest_framework import generics
 
+from django_redis import get_redis_connection
+
 from .serializers import (
     UserListSerializer,
     UserDetailSerializer,
@@ -17,20 +19,23 @@ from .serializers import (
 )
 from .models import Follow
 from .tasks import send_follow_push_notification
+from .pagination import UserSearchListPagination
 
 from notifications.serializers import NotificationSerializer
 
 User = get_user_model()
 
-
+# needs caching for filtering until the session expires?
 class UserListAPI(generics.ListAPIView):
-    # def get_queryset()
-    queryset = User.objects.all()
-    # serializer_class = UserListSerializer
     filter_backends = [SearchFilter]
     search_fields = ["username", "first_name", "last_name"]
+    # pagination_class = UserSearchListPagination
 
-    def get_serializer(self, *args, **kwargs):  # ListAPIView is calling get_serializer
+    def get_queryset(self):
+        user_list = User.objects.all()
+        return user_list
+
+    def get_serializer(self, *args, **kwargs):
         serializer_class = self.get_serializer_class()
         return serializer_class(*args, **kwargs)
 
@@ -76,6 +81,8 @@ class EditUserView(APIView):
         serializer = EditUserSerializer(request.user, data=data)
         if serializer.is_valid():
             serializer.save()
+            # delete/invalidate cache here
+            cache.delete(f"{request.user.id}:profile_detail_view")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -93,6 +100,7 @@ class UserFollowUnfollowAPI(APIView):
         serializer = FollowSerializer(data=follow_data)
         if serializer.is_valid():
             serializer.save()
+
             notification_data = {
                 "receiver": serializer.instance.following_user_id,
                 "sender": serializer.instance.follower_user_id,
@@ -107,8 +115,8 @@ class UserFollowUnfollowAPI(APIView):
                     device_id=device_id,
                     sender_id=notification_serializer.instance.sender_id,
                 )
-            else:
-                return "Could not save notification object"
+            # else:
+            #     return "Could not save notification object"
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -129,6 +137,7 @@ class UserFollowUnfollowAPI(APIView):
         )
 
 
+# needs caching?
 class CheckFollowedAPI(APIView):
     def get(self, request, *args, **kwargs):
         data = request.query_params
@@ -141,6 +150,7 @@ class CheckFollowedAPI(APIView):
         return Response({"following": False}, status=status.HTTP_200_OK)
 
 
+# needs different type of caching
 class UserFollowersListAPI(APIView):
     def get_object(self, pk):
         try:
@@ -165,6 +175,7 @@ class UserFollowersListAPI(APIView):
         )
 
 
+# needs different kind of caching
 class UserFollowingListAPI(APIView):
     def get_object(self, pk):
         try:

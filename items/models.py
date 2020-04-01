@@ -6,7 +6,6 @@ from notifications.models import Notification
 
 
 class Item(models.Model):
-    # choices = (("portrait", "pr"), ("landscape", "ln"), ("square", "sq"))
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="item_by"
     )
