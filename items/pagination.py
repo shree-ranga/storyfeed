@@ -3,8 +3,26 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
+class FeedPagination(LimitOffsetPagination):
+    default_limit = 5
+
+    def get_paginated_response(self, data):
+        return Response(
+            {"count": self.count, "results": data}, status=status.HTTP_200_OK
+        )
+
+
+class SearchItemListPagination(LimitOffsetPagination):
+    default_limit = 9
+
+    def get_paginated_response(self, data):
+        return Response(
+            {"count": self.count, "results": data}, status=status.HTTP_200_OK
+        )
+
+
 class UserItemListPagination(LimitOffsetPagination):
-    default_limit = 3
+    default_limit = 9
 
     def get_paginated_response(self, data):
         return Response(

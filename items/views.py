@@ -13,7 +13,7 @@ from .serializers import (
     ItemDetailSerializer,
     LikeSerializer,
 )
-from .pagination import UserItemListPagination
+from .pagination import UserItemListPagination, SearchItemListPagination, FeedPagination
 
 from notifications.serializers import NotificationSerializer
 
@@ -69,22 +69,40 @@ class UserItemListDetailView(generics.ListAPIView):
         return ItemDetailSerializer
 
 
-class AllItemsView(APIView):
-    def get(self, request, *args, **kwargs):
-        queryset = Item.objects.all()
-        serializer = ItemListSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+class ExploreItemsView(generics.ListAPIView):
+    pagination_class = SearchItemListPagination
 
-
-class UserFeedView(APIView):
-    def get(self, request, *args, **kwargs):
-        user = request.user
-        user_id = user.id
+    def get_queryset(self):
+        user = self.request.user
         following_ids = list(user.profile.following.all().values_list(flat=True))
-        following_ids.append(user_id)
+        following_ids.append(user.id)
+        queryset = Item.objects.exclude(user__in=following_ids)
+        return queryset
+
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        return serializer_class(*args, **kwargs)
+
+    def get_serializer_class(self):
+        return ItemListSerializer
+
+
+class UserFeedView(generics.ListAPIView):
+    pagination_class = FeedPagination
+
+    def get_queryset(self):
+        user = self.request.user
+        following_ids = list(user.profile.following.all().values_list(flat=True))
+        following_ids.append(user.id)
         queryset = Item.objects.filter(user__in=following_ids)
-        serializer = ItemDetailSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return queryset
+
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        return serializer_class(*args, **kwargs)
+
+    def get_serializer_class(self):
+        return ItemDetailSerializer
 
 
 class LikeItemView(APIView):

@@ -19,17 +19,17 @@ from .serializers import (
 )
 from .models import Follow
 from .tasks import send_follow_push_notification
-from .pagination import UserSearchListPagination
+from .pagination import UserSearchPagination, UserFollowerFollowingPagination
 
 from notifications.serializers import NotificationSerializer
 
 User = get_user_model()
 
-# needs caching for filtering until the session expires?
+
 class UserListAPI(generics.ListAPIView):
     filter_backends = [SearchFilter]
     search_fields = ["username", "first_name", "last_name"]
-    # pagination_class = UserSearchListPagination
+    pagination_class = UserSearchPagination
 
     def get_queryset(self):
         user_list = User.objects.all()
@@ -81,8 +81,6 @@ class EditUserView(APIView):
         serializer = EditUserSerializer(request.user, data=data)
         if serializer.is_valid():
             serializer.save()
-            # delete/invalidate cache here
-            cache.delete(f"{request.user.id}:profile_detail_view")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -137,7 +135,6 @@ class UserFollowUnfollowAPI(APIView):
         )
 
 
-# needs caching?
 class CheckFollowedAPI(APIView):
     def get(self, request, *args, **kwargs):
         data = request.query_params
@@ -150,51 +147,51 @@ class CheckFollowedAPI(APIView):
         return Response({"following": False}, status=status.HTTP_200_OK)
 
 
-# needs different type of caching
-class UserFollowersListAPI(APIView):
-    def get_object(self, pk):
+class UserFollowersListAPI(generics.ListAPIView):
+    pagination_class = UserFollowerFollowingPagination
+
+    def get_object(self):
+        pk = self.kwargs["pk"]
         try:
             user = User.objects.get(pk=pk)
             return user
         except:
             raise ValidationError("User object does not exist")
 
-    def get_queryset(self, pk):
-        user = self.get_object(pk=pk)
+    def get_queryset(self):
+        user = self.get_object()
         followers_ids = list(user.profile.followers.all().values_list(flat=True))
         followers = User.objects.filter(pk__in=followers_ids)
         return followers
 
-    def get(self, request, pk=None, *args, **kwargs):
-        if pk is not None:
-            queryset = self.get_queryset(pk)
-            serializer = UserListSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(
-            {"error": "Could not fetch followers"}, status=status.HTTP_400_BAD_REQUEST
-        )
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        return serializer_class(*args, **kwargs)
+
+    def get_serializer_class(self):
+        return UserListSerializer
 
 
-# needs different kind of caching
-class UserFollowingListAPI(APIView):
-    def get_object(self, pk):
+class UserFollowingListAPI(generics.ListAPIView):
+    pagination_class = UserFollowerFollowingPagination
+
+    def get_object(self):
+        pk = self.kwargs["pk"]
         try:
             user = User.objects.get(pk=pk)
             return user
         except:
             raise ValidationError("User object does not exist")
 
-    def get_queryset(self, pk):
-        user = self.get_object(pk=pk)
+    def get_queryset(self):
+        user = self.get_object()
         following_ids = list(user.profile.following.all().values_list(flat=True))
         following = User.objects.filter(pk__in=following_ids)
         return following
 
-    def get(self, request, pk=None, *args, **kwargs):
-        if pk is not None:
-            queryset = self.get_queryset(pk)
-            serializer = UserListSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(
-            {"error": "Could not fetch followers"}, status=status.HTTP_400_BAD_REQUEST
-        )
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        return serializer_class(*args, **kwargs)
+
+    def get_serializer_class(self):
+        return UserListSerializer
