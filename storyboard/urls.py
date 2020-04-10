@@ -12,6 +12,7 @@ urlpatterns = [
     path(api_v1 + "items/", include("items.urls")),
     path(api_v1 + "comments/", include("comments.urls")),
     path(api_v1 + "notifications/", include("notifications.urls")),
+    # path("play/", include("play.urls")),
 ]
 
 if settings.DEBUG:

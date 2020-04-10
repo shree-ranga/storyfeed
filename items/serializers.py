@@ -1,3 +1,5 @@
+from io import BytesIO
+
 from django.db.models import F
 
 from rest_framework import serializers
@@ -12,7 +14,7 @@ class ItemCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ["id", "user", "item", "caption"]
+        fields = ["id", "user", "item"]
         read_only_fields = ["id"]
 
 
@@ -40,7 +42,6 @@ class ItemDetailSerializer(serializers.ModelSerializer):
             "id",
             "user",
             "item",
-            "caption",
             "created_at",
             "likes_count",
             "comments_count",

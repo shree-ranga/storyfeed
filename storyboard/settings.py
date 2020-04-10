@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "accounts",
     "items",
     "comments",
+    "play",
 ]
 
 MIDDLEWARE = [
@@ -157,6 +158,7 @@ REST_FRAMEWORK = {
 CELERY_BROKER_URL = "amqp://localhost:5672"
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
+CELERY_TIMEZONE = "America/Toronto"
 
 # APNs settings
 PUSH_NOTIFICATIONS_SETTINGS = {
@@ -168,8 +170,9 @@ PUSH_NOTIFICATIONS_SETTINGS = {
 }
 
 # AWS S3
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-AWS_STORAGE_BUCKET_NAME = "storyfeed-remote-s3-test"
-AWS_DEFAULT_ACL = None
-AWS_S3_FILE_OVERWRITE = False
-AWS_LOCATION = "media"
+# DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+# AWS_STORAGE_BUCKET_NAME = "storyfeed-remote-s3-test"
+# AWS_DEFAULT_ACL = None
+# AWS_S3_FILE_OVERWRITE = False
+# AWS_LOCATION = "media"
+# AWS_S3_CUSTOM_DOMAIN = "d1jb0mkjj1vmul.cloudfront.net"

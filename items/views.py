@@ -1,4 +1,10 @@
+import os
+import time
+from io import BytesIO
+
 from django.db.models import F
+from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
 
 from rest_framework.views import APIView
 from rest_framework import generics
@@ -6,48 +12,59 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 
-from .models import Item, Like
-from .serializers import (
+from PIL import Image
+
+import boto3
+
+from items.models import Item, Like
+from items.serializers import (
     ItemCreateSerializer,
     ItemListSerializer,
     ItemDetailSerializer,
     LikeSerializer,
 )
-from .pagination import UserItemListPagination, SearchItemListPagination, FeedPagination
+from items.pagination import (
+    UserItemListPagination,
+    SearchItemListPagination,
+    FeedPagination,
+)
 
 from notifications.serializers import NotificationSerializer
 
-from .tasks import delete_after_expiration
+from items.tasks import delete_after_expiration
 
 from datetime import timedelta
+
+User = get_user_model()
+srr = User.objects.get(username="srr")
+s3 = boto3.resource("s3")
 
 
 class ItemCreateView(APIView):
     def post(self, request, *args, **kwargs):
-        item = request.data.get("item")
-        expiration_time = request.data.pop("expiration_time")
-        data = {"item": item}
-        serializer = ItemCreateSerializer(data=data)
+        item = self.request.data.get("item")
+        expiration_time = self.request.data.pop("expiration_time")
+        serializer = ItemCreateSerializer(data={"item": item})
         if serializer.is_valid():
-            serializer.save(user=request.user)
-            if expiration_time[0] == "1 day":
+            serializer.save(user=srr)
+            if expiration_time[0] == "1D":
                 delete_after_expiration.apply_async(
                     args=(serializer.instance.id,),
                     eta=serializer.instance.created_at + timedelta(seconds=2),
                 )
-            elif expiration_time[0] == "1 week":
+            elif expiration_time[0] == "1W":
                 delete_after_expiration.apply_async(
                     args=(serializer.instance.id,),
                     eta=serializer.instance.created_at + timedelta(seconds=5),
                 )
-            elif expiration_time[0] == "1 year":
+            elif expiration_time[0] == "1Y":
                 delete_after_expiration.apply_async(
                     args=(serializer.instance.id,),
                     eta=serializer.instance.created_at + timedelta(seconds=10),
                 )
-            return Response(
-                {"msg": "Upload item successful..."}, status=status.HTTP_201_CREATED
-            )
+                return Response(
+                    {"msg": "Upload item successful..."}, status=status.HTTP_200_OK
+                )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -124,7 +141,7 @@ class LikeItemView(APIView):
                     notification_serializer.save()
                 else:
                     return "Could not save notification object"
-            return Response({"msg": "Like created..."}, status=status.HTTP_201_CREATED)
+            return Response({"msg": "Like created..."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -147,6 +164,23 @@ class CheckItemLikeView(APIView):
 
 
 class ItemDeleteView(APIView):
-    # delete method when user'd like to delete before expiration
+    # TODO: - release task from celery
     def delete(self, request, *args, **kwargs):
-        pass
+        item_id = request.query_params.get("post_id")
+        item = Item.objects.get(id=item_id)
+        item.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ReportItemView(APIView):
+    # TODO: - run a periodic task to monitor reports
+    def post(self, request, *args, **kwargs):
+        item_id = request.data.get("post_id")
+        item = Item.objects.get(id=item_id)
+        item.report_counter += 1
+        item.save()
+        return Response(status=status.HTTP_201_CREATED)
+
+
+class AwsS3SignatureAPI(APIView):
+    pass

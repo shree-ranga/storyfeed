@@ -1,6 +1,9 @@
 from celery import shared_task
 
+from PIL import Image
+
 from items.models import Item
+from items.serializers import ItemCreateSerializer
 
 
 @shared_task
