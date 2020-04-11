@@ -14,8 +14,6 @@ from rest_framework.exceptions import ValidationError
 
 from PIL import Image
 
-import boto3
-
 from items.models import Item, Like
 from items.serializers import (
     ItemCreateSerializer,
@@ -35,10 +33,6 @@ from items.tasks import delete_after_expiration
 
 from datetime import timedelta
 
-User = get_user_model()
-srr = User.objects.get(username="srr")
-s3 = boto3.resource("s3")
-
 
 class ItemCreateView(APIView):
     def post(self, request, *args, **kwargs):
@@ -46,7 +40,7 @@ class ItemCreateView(APIView):
         expiration_time = self.request.data.pop("expiration_time")
         serializer = ItemCreateSerializer(data={"item": item})
         if serializer.is_valid():
-            serializer.save(user=srr)
+            serializer.save(user=request.user)
             if expiration_time[0] == "1D":
                 delete_after_expiration.apply_async(
                     args=(serializer.instance.id,),

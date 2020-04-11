@@ -57,7 +57,7 @@ class LikeSerializer(serializers.ModelSerializer):
 
 
 class LikeNotificationSerializer(serializers.ModelSerializer):
-    item = ItemListSerializer()
+    item = ItemDetailSerializer()
 
     class Meta:
         model = Like

@@ -5,6 +5,7 @@ from django.conf import settings
 
 from notifications.models import Notification
 
+
 class User(AbstractUser):
     def __str__(self):
         return self.username
@@ -33,6 +34,7 @@ class Follow(models.Model):
     follower_user = models.ForeignKey(
         Profile, related_name="following_user", on_delete=models.CASCADE
     )
+    created_at = models.DateTimeField(auto_now_add=True)
     notifications = GenericRelation(Notification)
 
     class Meta:
