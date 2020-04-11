@@ -75,11 +75,11 @@ class LoginAPI(APIView):
 
 
 class LogoutAPI(APIView):
-    def get_object(self, user):
-        return get_object_or_404(Token, user=user)
+    pass
+    # def get_object(self, user):
+    #     return get_object_or_404(Token, user=user)
 
-    def delete(self, request, *args, **kwargs):
-        # token = Token.objects.get(user=request.user)
-        token = self.get_object(request.user)
-        token.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    # def delete(self, request, *args, **kwargs):
+    #     token = self.get_object(request.user)
+    #     token.delete()
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
