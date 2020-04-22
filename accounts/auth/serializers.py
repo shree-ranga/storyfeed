@@ -45,14 +45,19 @@ class LoginSerializer(serializers.Serializer):
         email = data.get("email", None)
         password = data.get("password")
 
-        user_obj = User.objects.filter(Q(email=email) | Q(username=username))[0]
+        try:
+            user_obj = User.objects.filter(Q(email=email) | Q(username=username))[0]
+        except:
+            raise ValidationError("Invalid Username/Email.")
+
         user = authenticate(username=user_obj.username, password=password)
 
         if user is not None:
             data["user"] = user
         else:
-            msg = "Invalid Username/Email or Password."
+            msg = "Invalid Password."
             raise ValidationError(msg)
+
         return data
 
 
@@ -66,4 +71,3 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
 
 class PasswordResetSerializer(serializers.ModelSerializer):
     pass
-

@@ -29,7 +29,7 @@ from items.pagination import (
 
 from notifications.serializers import NotificationSerializer
 
-from items.tasks import delete_after_expiration
+from items.tasks import delete_after_expiration, send_item_like_notification
 
 from datetime import timedelta
 
@@ -133,8 +133,8 @@ class LikeItemView(APIView):
                 notification_serializer = NotificationSerializer(data=notification_data)
                 if notification_serializer.is_valid():
                     notification_serializer.save()
-                else:
-                    return "Could not save notification object"
+                # else:
+                #     return "Could not save notification object"
             return Response({"msg": "Like created..."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

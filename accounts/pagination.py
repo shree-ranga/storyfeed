@@ -12,7 +12,7 @@ class UserSearchPagination(LimitOffsetPagination):
 
 
 class UserFollowerFollowingPagination(LimitOffsetPagination):
-    default_limit = 9
+    default_limit = 3
 
     def get_paginated_response(self, data):
         return Response(

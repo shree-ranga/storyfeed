@@ -27,7 +27,6 @@ class CheckUserExistsAPI(APIView):
             return Response({"exists": False}, status=status.HTTP_200_OK)
 
 
-# needs caching
 class CheckEmailExistsAPI(APIView):
     permission_classes = [AllowAny]
 
@@ -80,3 +79,7 @@ class LogoutAPI(APIView):
     #     token = Token.objects.get(user=request.user)
     #     token.delete()
     #     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ChangePasswordAPI(APIView):
+    pass

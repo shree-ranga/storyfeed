@@ -8,6 +8,8 @@ from .models import Comment
 from .serializers import CommentCreateSerializer, CommentListSerializer
 from .pagination import CommentPagination
 
+from .tasks import send_comment_notification
+
 from notifications.serializers import NotificationSerializer
 
 
@@ -29,8 +31,8 @@ class CommentCreateView(APIView):
                 notification_serializer = NotificationSerializer(data=notification_data)
                 if notification_serializer.is_valid():
                     notification_serializer.save()
-                else:
-                    return "Could not save notification object"
+                # else:
+                #     return "Could not save notification object"
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
