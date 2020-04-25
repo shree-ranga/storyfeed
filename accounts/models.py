@@ -22,6 +22,21 @@ class Profile(models.Model):
     )
     updated_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def followers_count(self):
+        return self.followers.count()
+
+    @property
+    def following_count(self):
+        return self.following.count()
+
+    @property
+    def avatar_url(self):
+        try:
+            return self.avatar.url
+        except:
+            return None
+
     def __str__(self):
         return f"{self.user.username}'s profile"
 

@@ -54,7 +54,7 @@ class UserDetailAPI(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class UploadProfileAvatarAPI(APIView):
+class ProfileAvatarAPI(APIView):
     def patch(self, request, *args, **kwargs):
         data = request.data
         avatar = data.get("avatar")
@@ -69,13 +69,13 @@ class UploadProfileAvatarAPI(APIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, *args, **kwargs):
+        profile_avatar = request.user.profile.avatar
+        profile_avatar.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class EditUserView(APIView):
-    def get(self, request, *args, **kwargs):
-        user = request.user
-        serialiazer = EditUserSerializer(user)
-        return Response(serialiazer.data, status=status.HTTP_200_OK)
-
     def put(self, request, *args, **kwargs):
         data = request.data
         serializer = EditUserSerializer(request.user, data=data)

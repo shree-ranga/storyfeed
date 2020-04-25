@@ -11,6 +11,8 @@ from rest_framework.authtoken.models import Token
 from .serializers import LoginSerializer, LogoutSerializer, RegisterSerializer
 from accounts.models import Profile
 
+import json
+
 User = get_user_model()
 
 
@@ -67,8 +69,21 @@ class LoginAPI(APIView):
         if serializer.is_valid():
             user = serializer.validated_data.get("user")
             token, created = Token.objects.get_or_create(user=user)
+            if token.user.profile.avatar is None:
+                print("No avatar")
             return Response(
-                {"token": token.key, "id": user.id}, status=status.HTTP_200_OK
+                {
+                    "token": token.key,
+                    "id": token.user.id,
+                    "username": token.user.username,
+                    "fullname": f"{token.user.first_name} {token.user.last_name}",
+                    "email": token.user.email,
+                    "avatar": token.user.profile.avatar_url,
+                    "bio": token.user.profile.bio,
+                    "followers_count": token.user.profile.followers_count,
+                    "following_count": token.user.profile.following_count,
+                },
+                status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

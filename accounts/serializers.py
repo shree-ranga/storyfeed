@@ -27,18 +27,12 @@ class UserListSerializer(serializers.ModelSerializer):
 
 
 class ProfileDetailSerializer(serializers.ModelSerializer):
-    total_followers = serializers.SerializerMethodField()
-    total_following = serializers.SerializerMethodField()
+    total_followers = serializers.ReadOnlyField(source="followers_count")
+    total_following = serializers.ReadOnlyField(source="following_count")
 
     class Meta:
         model = Profile
         fields = ["avatar", "bio", "total_followers", "total_following"]
-
-    def get_total_followers(self, obj):
-        return obj.followers.count()
-
-    def get_total_following(self, obj):
-        return obj.following.count()
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
@@ -98,8 +92,8 @@ class EditUserSerializer(serializers.ModelSerializer):
         instance.email = validated_data.get("email", instance.email)
         instance.profile.bio = validated_data.get("bio", instance.profile.bio)
         instance.profile.avatar = validated_data.get("avatar", instance.profile.avatar)
-        instance.profile.save()
         instance.save()
+        instance.profile.save()
         return instance
 
     def get_full_name(self, obj):
