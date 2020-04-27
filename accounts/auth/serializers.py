@@ -66,8 +66,13 @@ class LogoutSerializer(serializers.Serializer):
 
 
 class PasswordChangeSerializer(serializers.ModelSerializer):
-    pass
+    class Meta:
+        model = User
+        fields = ["password"]
+        extra_kwargs = {"password": {"write_only": True}}
 
-
-class PasswordResetSerializer(serializers.ModelSerializer):
-    pass
+    def update(self, instance, validated_data):
+        password = validated_data.get("password", "")
+        instance.set_password(password)
+        instance.save()
+        return instance

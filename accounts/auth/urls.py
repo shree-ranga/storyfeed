@@ -6,6 +6,7 @@ from .views import (
     RegisterAPI,
     LoginAPI,
     LogoutAPI,
+    ChangePasswordAPI,
 )
 
 urlpatterns = [
@@ -20,5 +21,5 @@ urlpatterns = [
     path("register/", RegisterAPI.as_view(), name="register"),
     path("login/", LoginAPI.as_view(), name="login"),
     path("logout/", LogoutAPI.as_view(), name="logout"),
+    path("change-password/", ChangePasswordAPI.as_view(), name="change_password"),
 ]
-

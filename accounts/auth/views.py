@@ -8,7 +8,12 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
 
-from .serializers import LoginSerializer, LogoutSerializer, RegisterSerializer
+from .serializers import (
+    LoginSerializer,
+    LogoutSerializer,
+    RegisterSerializer,
+    PasswordChangeSerializer,
+)
 from accounts.models import Profile
 
 import json
@@ -91,10 +96,19 @@ class LoginAPI(APIView):
 class LogoutAPI(APIView):
     pass
     # def delete(self, request, *args, **kwargs):
-    #     token = Token.objects.get(user=request.user)
-    #     token.delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
+    #     pass
+    #     # token = Token.objects.get(user=request.user)
+    #     # token.delete()
+    #     # return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ChangePasswordAPI(APIView):
-    pass
+    def put(self, request, *args, **kwargs):
+        user = request.user
+        password = request.data.get("password")
+        data = {"password": password}
+        serializer = PasswordChangeSerializer(user, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
