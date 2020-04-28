@@ -31,6 +31,11 @@ class CommentCreateView(APIView):
                 notification_serializer = NotificationSerializer(data=notification_data)
                 if notification_serializer.is_valid():
                     notification_serializer.save()
+                    send_comment_notification.delay(
+                        receiver_id=notification_serializer.instance.receiver_id,
+                        sender_id=notification_serializer.instance.sender_id,
+                        comment=serializer.instance.comment,
+                    )
                 # else:
                 #     return "Could not save notification object"
             return Response(serializer.data, status=status.HTTP_201_CREATED)

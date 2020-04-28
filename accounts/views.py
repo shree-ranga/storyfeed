@@ -91,7 +91,6 @@ class UserFollowUnfollowAPI(APIView):
         data = request.data
         follower_user_id = request.user.id
         following_user_id = data.get("following_user_id")
-        device_id = data.get("device_id")
         follow_data = {}
         follow_data["follower_user"] = follower_user_id
         follow_data["following_user"] = following_user_id
@@ -110,7 +109,6 @@ class UserFollowUnfollowAPI(APIView):
                 notification_serializer.save()
                 send_follow_push_notification.delay(
                     receiver_id=notification_serializer.instance.receiver_id,
-                    device_id=device_id,
                     sender_id=notification_serializer.instance.sender_id,
                 )
             # else:

@@ -133,6 +133,10 @@ class LikeItemView(APIView):
                 notification_serializer = NotificationSerializer(data=notification_data)
                 if notification_serializer.is_valid():
                     notification_serializer.save()
+                    send_item_like_notification.delay(
+                        receiver_id=notification_serializer.instance.receiver_id,
+                        sender_id=notification_serializer.instance.sender_id,
+                    )
                 # else:
                 #     return "Could not save notification object"
             return Response({"msg": "Like created..."}, status=status.HTTP_200_OK)
