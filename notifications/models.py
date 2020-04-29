@@ -20,6 +20,8 @@ class Notification(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")
     notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPE)
+    badge_count = models.IntegerField(default=0)
+    checked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

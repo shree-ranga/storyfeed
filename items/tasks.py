@@ -5,7 +5,8 @@ from celery import shared_task
 from push_notifications.models import APNSDevice
 
 from items.models import Item
-from items.serializers import ItemCreateSerializer
+
+from notifications.models import Notification
 
 User = get_user_model()
 
@@ -27,4 +28,5 @@ def send_item_like_notification(receiver_id, sender_id):
 
     sender = User.objects.get(id=sender_id)
     msg = f"{sender.username} ({sender.first_name} {sender.last_name}) liked your post."
-    devices.send_message(msg)
+    badge_count = Notification.objects.filter(checked=False).count()
+    devices.send_message(message={"body": msg}, badge=badge_count)

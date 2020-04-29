@@ -4,7 +4,7 @@ from celery import shared_task
 
 from push_notifications.models import APNSDevice
 
-# from .models import Comment
+from notifications.models import Notification
 
 User = get_user_model()
 
@@ -18,4 +18,5 @@ def send_comment_notification(receiver_id, sender_id, comment):
 
     sender = User.objects.get(id=sender_id)
     msg = f"""{sender.username} commented: "{comment}" on your post."""
-    devices.send_message(msg)
+    badge_count = Notification.objects.filter(checked=False).count()
+    devices.send_message(message={"body": msg}, badge=badge_count)

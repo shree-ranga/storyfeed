@@ -1,4 +1,7 @@
 from rest_framework import generics
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 from .models import Notification
 from .serializers import NotificationListSerializer
@@ -18,3 +21,9 @@ class NotificationListView(generics.ListAPIView):
 
     def get_serializer_class(self):
         return NotificationListSerializer
+
+
+class SetNotificationsCheckedAPI(APIView):
+    def put(self, request, *args, **kwargs):
+        Notification.objects.filter(checked=False).update(checked=True)
+        return Response(status=status.HTTP_201_CREATED)
