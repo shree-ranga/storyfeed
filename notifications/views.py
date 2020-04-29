@@ -25,5 +25,7 @@ class NotificationListView(generics.ListAPIView):
 
 class SetNotificationsCheckedAPI(APIView):
     def put(self, request, *args, **kwargs):
-        Notification.objects.filter(checked=False).update(checked=True)
+        Notification.objects.filter(checked=False, receiver=request.user).update(
+            checked=True
+        )
         return Response(status=status.HTTP_201_CREATED)
