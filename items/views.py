@@ -44,17 +44,17 @@ class ItemCreateView(APIView):
             if expiration_time[0] == "1D":
                 delete_after_expiration.apply_async(
                     args=(serializer.instance.id,),
-                    eta=serializer.instance.created_at + timedelta(seconds=2),
+                    eta=serializer.instance.created_at + timedelta(days=30),
                 )
             elif expiration_time[0] == "1W":
                 delete_after_expiration.apply_async(
                     args=(serializer.instance.id,),
-                    eta=serializer.instance.created_at + timedelta(seconds=5),
+                    eta=serializer.instance.created_at + timedelta(days=30),
                 )
             elif expiration_time[0] == "1Y":
                 delete_after_expiration.apply_async(
                     args=(serializer.instance.id,),
-                    eta=serializer.instance.created_at + timedelta(seconds=10),
+                    eta=serializer.instance.created_at + timedelta(days=30),
                 )
                 return Response(
                     {"msg": "Upload item successful..."}, status=status.HTTP_200_OK

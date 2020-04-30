@@ -1,16 +1,17 @@
 from rest_framework import serializers
 
 from accounts.serializers import UserListSerializer
-from items.serializers import ItemDetailSerializer
+from items.serializers import ItemDetailSerializer, ItemListSerializer
 from .models import Comment
 
 
 class CommentCreateSerializer(serializers.ModelSerializer):
     user = UserListSerializer(required=False)
+    item = ItemListSerializer(required=False)
 
     class Meta:
         model = Comment
-        fields = ["id", "comment", "user", "item"]
+        fields = ["id", "comment", "user", "item", "created_at"]
         read_only_fields = ["id"]
 
 

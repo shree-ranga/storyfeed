@@ -8,6 +8,8 @@ from .models import Comment
 from .serializers import CommentCreateSerializer, CommentListSerializer
 from .pagination import CommentPagination
 
+from items.models import Item
+
 from .tasks import send_comment_notification
 
 from notifications.serializers import NotificationSerializer
@@ -17,10 +19,11 @@ class CommentCreateView(APIView):
     def post(self, request, *args, **kwargs):
         item_id = request.data.get("post_id")
         comment = request.data.get("comment")
-        data = {"comment": comment, "item": item_id}
+        item = Item.objects.get(id=item_id)
+        data = {"comment": comment}
         serializer = CommentCreateSerializer(data=data)
         if serializer.is_valid():
-            serializer.save(user=request.user)
+            serializer.save(user=request.user, item=item)
             if serializer.instance.user != serializer.instance.item.user:
                 notification_data = {
                     "receiver": serializer.instance.item.user.id,
@@ -39,6 +42,7 @@ class CommentCreateView(APIView):
                 # else:
                 #     return "Could not save notification object"
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -56,11 +60,3 @@ class CommentListView(generics.ListAPIView):
 
     def get_serializer_class(self):
         return CommentListSerializer
-
-    # def get(self, request, *args, **kwargs):
-    #     item_id = request.query_params.get("post_id")
-    #     queryset = self.get_queryset(id=item_id)
-    #     if queryset:
-    #         serializer = CommentListSerializer(queryset, many=True)
-    #         return Response(serializer.data, status=status.HTTP_200_OK)
-    #     return Response(status=status.HTTP_404_NOT_FOUND)
