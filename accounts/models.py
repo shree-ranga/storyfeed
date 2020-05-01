@@ -7,6 +7,8 @@ from notifications.models import Notification
 
 
 class User(AbstractUser):
+    full_name = models.CharField(max_length=1000, null=True, blank=True)
+
     def __str__(self):
         return self.username
 

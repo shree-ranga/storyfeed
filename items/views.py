@@ -95,7 +95,7 @@ class ExploreItemsView(generics.ListAPIView):
         return serializer_class(*args, **kwargs)
 
     def get_serializer_class(self):
-        return ItemListSerializer
+        return ItemDetailSerializer
 
 
 class UserFeedView(generics.ListAPIView):

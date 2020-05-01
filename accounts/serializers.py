@@ -14,16 +14,12 @@ class ProfileAvatarSerializer(serializers.ModelSerializer):
 
 
 class UserListSerializer(serializers.ModelSerializer):
-    full_name = serializers.SerializerMethodField()
     profile = ProfileAvatarSerializer(required=False, many=False)
 
     class Meta:
         model = User
         fields = ["id", "username", "full_name", "profile"]
         read_only_fields = ["id"]
-
-    def get_full_name(self, obj):
-        return f"{obj.first_name} {obj.last_name}"
 
 
 class ProfileDetailSerializer(serializers.ModelSerializer):
@@ -36,16 +32,12 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    full_name = serializers.SerializerMethodField()
     profile = ProfileDetailSerializer(required=False, many=False)
 
     class Meta:
         model = User
         fields = ["id", "username", "full_name", "profile"]
         read_only_fields = ["id"]
-
-    def get_full_name(self, obj):
-        return f"{obj.first_name} {obj.last_name}"
 
 
 class EditProfileSerializer(serializers.ModelSerializer):
@@ -55,7 +47,6 @@ class EditProfileSerializer(serializers.ModelSerializer):
 
 
 class EditUserSerializer(serializers.ModelSerializer):
-    full_name = serializers.SerializerMethodField()
     update_full_name = serializers.CharField(required=False)
     bio = serializers.CharField(required=False)
     profile = EditProfileSerializer(read_only=True)
@@ -76,28 +67,15 @@ class EditUserSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
         extra_kwargs = {"username": {"required": False}}
 
-    def to_internal_value(self, data):
-        ret = super().to_internal_value(data)
-        update_full_name = ret.pop("update_full_name", None)
-        if update_full_name:
-            split_name = update_full_name.rsplit(None, 1)
-            ret["first_name"] = split_name[0]
-            ret["last_name"] = split_name[1]
-        return ret
-
     def update(self, instance, validated_data):
         instance.username = validated_data.get("username", instance.username)
-        instance.first_name = validated_data.get("first_name", instance.first_name)
-        instance.last_name = validated_data.get("last_name", instance.last_name)
+        instance.full_name = validated_data.get("full_name", instance.full_name)
         instance.email = validated_data.get("email", instance.email)
         instance.profile.bio = validated_data.get("bio", instance.profile.bio)
         instance.profile.avatar = validated_data.get("avatar", instance.profile.avatar)
         instance.save()
         instance.profile.save()
         return instance
-
-    def get_full_name(self, obj):
-        return f"{obj.first_name} {obj.last_name}"
 
 
 class UserNotificationSerializer(serializers.ModelSerializer):
