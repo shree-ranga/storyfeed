@@ -16,8 +16,6 @@ from .serializers import (
 )
 from accounts.models import Profile
 
-import json
-
 User = get_user_model()
 
 
@@ -59,7 +57,14 @@ class RegisterAPI(APIView):
             # generate token for new user
             token = Token.objects.create(user=serializer.instance)
             return Response(
-                {"token": token.key, "id": serializer.instance.id},
+                {
+                    "token": token.key,
+                    "id": token.user.id,
+                    "username": token.user.username,
+                    "fullname": token.user.full_name,
+                    "email": token.user.email,
+                    "avatar": token.user.profile.avatar_url,
+                },
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -81,7 +86,7 @@ class LoginAPI(APIView):
                     "token": token.key,
                     "id": token.user.id,
                     "username": token.user.username,
-                    "fullname": f"{token.user.first_name} {token.user.last_name}",
+                    "fullname": token.user.full_name,
                     "email": token.user.email,
                     "avatar": token.user.profile.avatar_url,
                     "bio": token.user.profile.bio,
@@ -112,3 +117,10 @@ class ChangePasswordAPI(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteUserAPI(APIView):
+    def delete(self, request, *args, **kwargs):
+        instance = request.user
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -7,6 +7,7 @@ from .views import (
     LoginAPI,
     LogoutAPI,
     ChangePasswordAPI,
+    DeleteUserAPI,
 )
 
 urlpatterns = [
@@ -22,4 +23,5 @@ urlpatterns = [
     path("login/", LoginAPI.as_view(), name="login"),
     path("logout/", LogoutAPI.as_view(), name="logout"),
     path("change-password/", ChangePasswordAPI.as_view(), name="change_password"),
+    path("delete-user/", DeleteUserAPI.as_view(), name="delete_user_account"),
 ]

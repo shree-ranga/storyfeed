@@ -47,7 +47,6 @@ class EditProfileSerializer(serializers.ModelSerializer):
 
 
 class EditUserSerializer(serializers.ModelSerializer):
-    update_full_name = serializers.CharField(required=False)
     bio = serializers.CharField(required=False)
     profile = EditProfileSerializer(read_only=True)
     avatar = serializers.ImageField(required=False)
@@ -62,7 +61,6 @@ class EditUserSerializer(serializers.ModelSerializer):
             "profile",
             "avatar",
             "email",
-            "update_full_name",
         ]
         read_only_fields = ["id"]
         extra_kwargs = {"username": {"required": False}}
