@@ -58,3 +58,7 @@ gunicorn.conf.py
 
 # local nginx
 storyboard_nginx.conf
+
+# local https
+server.crt
+server.key

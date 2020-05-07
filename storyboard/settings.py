@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "items",
     "comments",
     "play",
+    "webapp",
 ]
 
 MIDDLEWARE = [
@@ -84,11 +85,11 @@ WSGI_APPLICATION = "storyboard.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "storyboard_db",
-        "USER": "shree",
-        "PASSWORD": "shree123",
-        "HOST": "127.0.0.1",
-        "PORT": "5432",
+        "NAME": "storyboard_db",  # database name
+        "USER": "shree",  # master username
+        "PASSWORD": "shree123",  # master password
+        "HOST": "127.0.0.1",  # db instance
+        "PORT": "5432",  # db port, mostly 5432
     }
 }
 
@@ -137,6 +138,7 @@ USE_L10N = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Media
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
