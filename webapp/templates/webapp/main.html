@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: sans-serif, Arial, Helvetica;
+            line-height: 1.5;
+            /* background-color: #005fb2; */
+            background: linear-gradient(to top, rgba(0, 95, 178, 1), rgba(0, 95, 178, 0.7));
+            background-attachment: fixed;
+        }
+
+    </style>
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="discription" content="Official Storyfeed Website">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Storyfeed</title>
+        <!-- <link rel="shortcut icon" type="image/png" href="{% static 'favicon/favicon.png' %}" /> -->
+    </head>
+
+    <body>
+        {% block content %}
+        {% endblock %}
+    </body>
+
+
+</html>

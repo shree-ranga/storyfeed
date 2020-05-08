@@ -1,0 +1,300 @@
+{% extends 'webapp/main.html' %}
+{% block content %}
+
+
+<style>
+    article {
+        margin: 40px 60px 20px 60px;
+        display: flex;
+        flex-direction: column;
+        text-align: justify;
+    }
+
+    h2 {
+        text-align: center;
+        margin: 10px 0 20px 0;
+    }
+
+    h3 {
+        margin: 10px 0 10px 0;
+    }
+
+    p {
+        margin: 10px 0 10px 0;
+    }
+
+    table,
+    th,
+    td {
+        border: 1px solid black;
+        border-collapse: collapse;
+
+    }
+
+    th {
+        text-align: center;
+        height: 60px;
+    }
+
+    td {
+        text-align: left;
+        height: 50px;
+    }
+
+</style>
+
+
+<article>
+
+    <h2>Data Policy and Privacy</h2>
+
+    <!-- Beta Testing Data and Beta Feedback -->
+
+    <p>
+        When you use Beta App through TestFlight, Storyfeed, Inc will automatically collect crash logs and usage data
+        (“Beta
+        Testing Data”) and you may not opt-out of the collection of Beta Testing Data. You can submit written or visual
+        feedback (e.g., screenshots and comments) about the Beta App to Stroyfeed, Inc (“Beta Feedback”) with
+        TestFlight. If you
+        submit Beta Feedback, you acknowledge and agree that you do so at your own initiative and that the Storyfeed,
+        Inc will have
+        the right to use your Beta Feedback. You represent to the Storyfeed, Inc that you have all the necessary rights
+        to give
+        the Beta Feedback and to grant the rights to the Storyfeed, Inc.
+    </p>
+
+    <p>
+        Storyfeed, Inc uses the Beta Testing Data and Beta Feedback to improve App and related products and may contact
+        you
+        regarding your use of the Beta App. Apple may use the Beta Testing Data to improve its products and services.
+    </p>
+
+    <p>
+        Beta Testing Data and Beta Feedback may include personally identifying information and information about your
+        device,
+        including but not limited to various unique device identifiers, hardware and operating system specifications,
+        performance statistics, and data about how you use your device, system and application software, networking
+        information,
+        and peripherals.
+    </p>
+
+    <p>
+        When you test Storyfeed beta app with TestFlight, Apple will collect and send crash logs, your personal
+        information
+        such
+        as name and email address, usage information, and any feedback you submit to Storyfeed, Inc. Information that is
+        emailed
+        to Storyfeed, Inc directly is not shared with Apple. Storyfeed, Inc use this information only to improve the App
+        and
+        we
+        will not share it with a third party.
+    </p>
+
+    <p>
+        For requests to access or delete your TestFlight data, you should contact the Storyfeed, Inc directly.
+    </p>
+
+
+    <h3>Information Collected by Storyfeed from TestFlight</h3>
+
+    <p>
+        The following data is collected by Apple and shared with the Storyfeed when you use TestFlight for Storyfeed
+        Beta
+        App.
+        If you accepted an invitation through a public link only, your email address and name are not visible to the
+        developer.
+    </p>
+
+    <table id="table-1">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Description</th>
+            </tr>
+
+        </thead>
+        <tbody>
+            <tr>
+                <td>Email address</td>
+                <td>The email address you were invited to test the app with. This may or may not be the same as the
+                    Apple ID associated with your device. If you were invited with a public link, this information is
+                    not displayed to the developer.
+                </td>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td>Your first and last name as entered by the developer when they invited you to test the app using
+                    your email address. If you were invited with a public link, this information does not display.
+                </td>
+            </tr>
+            <tr>
+                <td>Invitation Type</td>
+                <td>
+                    Whether you were invited by email or through a public link.
+                </td>
+            </tr>
+            <tr>
+                <td>Status</td>
+                <td>The status of your invitation. This can be Invited, Accepted, or Installed. This changes based on
+                    your status, and is refreshed when you accept or install a beta build.
+                </td>
+            </tr>
+            <tr>
+                <td>Installs</td>
+                <td>The number of times you've installed a beta app build.
+                </td>
+            </tr>
+            <tr>
+                <td>Sessions
+                </td>
+                <td>The number of times you have used a beta app build.
+                </td>
+            </tr>
+            <tr>
+                <td>Crashes</td>
+                <td>The number of crashes per beta app build.
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+
+
+
+
+    <h3>
+        Data Shared to Storyfeed when Sending Feedback (iOS only)
+    </h3>
+
+    <p>
+        When you send feedback from the TestFlight app or send crashes or screenshots from the beta app, the following
+        additional information is shared to Storyfeed.
+    </p>
+
+    <table id="table-2">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Description</th>
+                <th>
+                    When this data is included
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>App Name</td>
+                <td>
+                    The name of the app you are testing.
+                </td>
+                <td>Included in all feedback</td>
+            </tr>
+            <tr>
+                <td>App Version</td>
+                <td>The most recent version and build that you have access to. This is the number that displays under
+                    the app name in the list of apps in TestFlight.
+                </td>
+                <td>Included in all feedback</td>
+            </tr>
+            <tr>
+                <td>Installed App Version</td>
+                <td>The version and build you have installed on your device.</td>
+                <td>Included in all feedback</td>
+            </tr>
+            <tr>
+                <td>Device</td>
+                <td>The model of your device.</td>
+                <td>Included in all feedback</td>
+            </tr>
+            <tr>
+                <td>iOS Version</td>
+                <td>The version of iOS your device is running.</td>
+                <td>Included in all feedback</td>
+            </tr>
+            <tr>
+                <td>Language</td>
+                <td>Your device language.</td>
+                <td>Included in all feedback</td>
+            </tr>
+            <tr>
+                <td>Carrier</td>
+                <td>Your wireless service provider.</td>
+                <td>Included in all feedback</td>
+            </tr>
+            <tr>
+                <td>Timezone</td>
+                <td>The timezone your device is set to.</td>
+                <td>Included in all feedback</td>
+            </tr>
+            <tr>
+                <td>Architecture</td>
+                <td>The type of Central Processing Unit (CPU) for your device.</td>
+                <td>Included in all feedback</td>
+            </tr>
+            <tr>
+                <td>Connection Type</td>
+                <td>Whether you were connected to Wi-Fi, cellular, or not connected at the time that the feedback was
+                    sent and your network type.
+                </td>
+                <td>Included in all feedback</td>
+            </tr>
+            <tr>
+                <td>Paired Apple Watch</td>
+                <td>If there is an Apple Watch app, the Apple Watch model and watchOS version is shared with the
+                    developer.
+                </td>
+                <td>Included in all feedback</td>
+            </tr>
+            <tr>
+                <td>Screenshot</td>
+                <td>The screenshots you share when providing feedback.</td>
+                <td>Only on devices running iOS 13 beta or later</td>
+            </tr>
+            <tr>
+                <td>Comments</td>
+                <td>The comments you share when providing feedback.</td>
+                <td>Only on devices running iOS 13 beta or later</td>
+            </tr>
+            <tr>
+                <td>App uptime</td>
+                <td>The length of time the app was open and running at the time the feedback was sent.
+
+                </td>
+                <td>Only on devices running iOS 13 beta or later</td>
+            </tr>
+            <tr>
+                <td>Disk Free</td>
+                <td>The amount of disk space you have available at the time the feedback was sent.
+                </td>
+                <td>Only on devices running iOS 13 beta or later</td>
+            </tr>
+            <tr>
+                <td>Battery</td>
+                <td>Your battery level at the time the feedback was sent.</td>
+                <td>Only on devices running iOS 13 beta or later</td>
+            </tr>
+            <tr>
+                <td>Screen Resolution</td>
+                <td>The screen resolution of your device.</td>
+                <td>Only on devices running iOS 13 beta or later</td>
+            </tr>
+            <tr>
+                <td>Crash Log</td>
+                <td>Symbolicated crash logs. This includes information about how long the app was running before it
+                    crashed.
+                </td>
+                <td>Only on devices running iOS 13 beta or later</td>
+            </tr>
+        </tbody>
+    </table>
+    <p>
+        Apple and Storyfeed, Inc is committed to diversity and to providing a safe, harassment-free experience for
+        everyone.
+        Beta Feedback should be respectful and should not include offensive, malicious, or derogatory writing, images,
+        or
+        screenshots.
+    </p>
+
+</article>
+
+{% endblock %}

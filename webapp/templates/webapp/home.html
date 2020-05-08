@@ -1,0 +1,69 @@
+{% extends 'webapp/main.html' %}
+{% block content %}
+<style>
+    #container {
+        /* color: white; */
+        color: black;
+        display: flex;
+        height: 96vh;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 0 20px;
+    }
+
+    #container h1 {
+        font-size: 50px;
+        /* margin-bottom: 10px; */
+    }
+
+    #container p {
+        font-size: 23px;
+        margin-bottom: 8px;
+    }
+
+    #foot {
+        font-size: small;
+        text-align: right;
+
+    }
+
+    .terms {
+        text-decoration: none;
+        /* margin-left: 50vw; */
+        color: black;
+
+    }
+
+    .privacy {
+        text-decoration: none;
+        margin-left: 2vw;
+        color: black;
+    }
+
+    .rights {
+        margin-left: 2vw;
+        /* padding-right: 6vw; */
+        /* margin-right: 4vw; */
+
+    }
+</style>
+
+
+<header id="container">
+    <h1 id="heading"><b>Storyfeed</b></h1>
+    <p>Share your moments in a fun and more meaningful way.</p>
+    <p>Beta coming soon!!!</p>
+</header>
+
+<footer id="foot">
+    <a href="{% url 'terms-storyfeed' %}" class="terms">TERMS</a>
+    <a href="{% url 'privacy-storyfeed' %}" class="privacy">PRIVACY</a>
+    <span class="rights">© 2020 Storyfeed Inc.All Rights Reserved.</span>
+
+</footer>
+
+
+
+
+{% endblock %}
