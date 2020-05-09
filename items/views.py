@@ -14,18 +14,19 @@ from rest_framework.exceptions import ValidationError
 
 from PIL import Image
 
-from items.models import Item, Like
-from items.serializers import (
+from .models import Item, Like
+from .serializers import (
     ItemCreateSerializer,
     ItemListSerializer,
     ItemDetailSerializer,
     LikeSerializer,
 )
-from items.pagination import (
+from .pagination import (
     UserItemListPagination,
     SearchItemListPagination,
     FeedPagination,
 )
+from .permissions import IsOwnerOrAdmin
 
 from notifications.serializers import NotificationSerializer
 
@@ -162,7 +163,8 @@ class CheckItemLikeView(APIView):
 
 
 class ItemDeleteView(APIView):
-    # TODO: - release task from celery
+    permission_classes = [IsOwnerOrAdmin]
+    # TODO: - make this a celery task
     def delete(self, request, *args, **kwargs):
         item_id = request.query_params.get("post_id")
         item = Item.objects.get(id=item_id)
@@ -180,5 +182,6 @@ class ReportItemView(APIView):
         return Response(status=status.HTTP_201_CREATED)
 
 
+# class to direct upload from Frontend
 class AwsS3SignatureAPI(APIView):
     pass

@@ -18,8 +18,9 @@ from .serializers import (
     EditUserSerializer,
 )
 from .models import Follow
-from .tasks import send_follow_push_notification
 from .pagination import UserSearchPagination, UserFollowerFollowingPagination
+from .permissions import IsOwnerOrAdmin
+from .tasks import send_follow_push_notification
 
 from notifications.serializers import NotificationSerializer
 
@@ -76,6 +77,8 @@ class ProfileAvatarAPI(APIView):
 
 
 class EditUserView(APIView):
+    permission_classes = [IsOwnerOrAdmin]
+
     def put(self, request, *args, **kwargs):
         data = request.data
         serializer = EditUserSerializer(request.user, data=data)
@@ -88,12 +91,11 @@ class EditUserView(APIView):
 class UserFollowUnfollowAPI(APIView):
     # follow
     def post(self, request, *args, **kwargs):
-        data = request.data
-        follower_user_id = request.user.id
-        following_user_id = data.get("following_user_id")
-        follow_data = {}
-        follow_data["follower_user"] = follower_user_id
-        follow_data["following_user"] = following_user_id
+        following_user_id = request.data.get("following_user_id")
+        follow_data = {
+            "follower_user": request.user.id,
+            "following_user": following_user_id,
+        }
         serializer = FollowSerializer(data=follow_data)
         if serializer.is_valid():
             serializer.save()
@@ -111,8 +113,6 @@ class UserFollowUnfollowAPI(APIView):
                     receiver_id=notification_serializer.instance.receiver_id,
                     sender_id=notification_serializer.instance.sender_id,
                 )
-            # else:
-            #     return "Could not save notification object"
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
