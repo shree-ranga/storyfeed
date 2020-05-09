@@ -4,6 +4,8 @@ from celery import shared_task
 
 from push_notifications.models import APNSDevice
 
+import boto3
+
 from items.models import Item
 
 from notifications.models import Notification

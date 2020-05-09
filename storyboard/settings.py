@@ -7,9 +7,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = "dl8551l01)^aw2ebm1z027yg19406!0-ig6m6%m)7^o3@*b$m6"
-SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -37,7 +36,6 @@ INSTALLED_APPS = [
     "accounts",
     "items",
     "comments",
-    "play",
     "webapp",
 ]
 
@@ -71,24 +69,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "storyboard.wsgi.application"
 
-
 # Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-#     }
-# }
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ["DB_NAME"],  # database name
-        "USER": os.environ["DB_USER"],  # master username
-        "PASSWORD": os.environ["DB_PASSWORD"],  # master password
-        "HOST": os.environ["DB_HOST"],  # db instance
+        "NAME": os.getenv("DB_NAME"),  # database name
+        "USER": os.getenv("DB_USER"),  # master username
+        "PASSWORD": os.getenv("DB_PASSWORD"),  # master password
+        "HOST": os.getenv("DB_HOST"),  # db instance
         "PORT": "5432",  # db port, mostly 5432
     }
 }
@@ -111,8 +99,6 @@ CACHES = {
 CACHE_TTL = 60 * 1
 
 # Password validation
-# https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
@@ -124,8 +110,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/2.2/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
@@ -154,7 +138,7 @@ REST_FRAMEWORK = {
 }
 
 # Celery
-CELERY_BROKER_URL = os.environ["CELERY_BROKER_URL"]
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_ALWAYS_EAGER = False
@@ -168,10 +152,13 @@ PUSH_NOTIFICATIONS_SETTINGS = {
     "UNIQUE_REG_ID": True,
 }
 
+# AWS
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+
 # AWS S3
-# DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-# AWS_STORAGE_BUCKET_NAME = "storyfeed-remote-s3-test"
-# AWS_DEFAULT_ACL = None
-# AWS_S3_FILE_OVERWRITE = False
-# AWS_LOCATION = "media"
-# AWS_S3_CUSTOM_DOMAIN = "d1jb0mkjj1vmul.cloudfront.net"
+DEFAULT_FILE_STORAGE = "storyboard.storage_backends.MediaStorage"
+AWS_S3_REGION_NAME = "us-east-2"  # e.g. us-east-2
+AWS_STORAGE_BUCKET_NAME = "storyfeed-remote-s3-test"
+AWS_DEFAULT_ACL = None
+AWS_S3_CUSTOM_DOMAIN = "d1jb0mkjj1vmul.cloudfront.net"
