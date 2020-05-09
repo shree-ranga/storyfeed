@@ -14,7 +14,8 @@ User = get_user_model()
 @shared_task
 def delete_after_expiration(item_id):
     try:
-        Item.objects.get(id=item_id).delete()
+        instance = Item.objects.get(id=item_id)
+        instance.delete()
     except Item.ObjectDoesNotExist:
         pass
 

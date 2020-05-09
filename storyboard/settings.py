@@ -8,8 +8,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "dl8551l01)^aw2ebm1z027yg19406!0-ig6m6%m)7^o3@*b$m6"
-
+# SECRET_KEY = "dl8551l01)^aw2ebm1z027yg19406!0-ig6m6%m)7^o3@*b$m6"
+SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -85,10 +85,10 @@ WSGI_APPLICATION = "storyboard.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "storyboard_db",  # database name
-        "USER": "shree",  # master username
-        "PASSWORD": "shree123",  # master password
-        "HOST": "127.0.0.1",  # db instance
+        "NAME": os.environ["DB_NAME"],  # database name
+        "USER": os.environ["DB_USER"],  # master username
+        "PASSWORD": os.environ["DB_PASSWORD"],  # master password
+        "HOST": os.environ["DB_HOST"],  # db instance
         "PORT": "5432",  # db port, mostly 5432
     }
 }
@@ -128,7 +128,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "America/Toronto"
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -154,10 +154,10 @@ REST_FRAMEWORK = {
 }
 
 # Celery
-CELERY_BROKER_URL = "amqp://localhost:5672//"
+CELERY_BROKER_URL = os.environ["CELERY_BROKER_URL"]
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
-CELERY_TIMEZONE = "America/Toronto"
+CELERY_ALWAYS_EAGER = False
 
 # APNs settings
 PUSH_NOTIFICATIONS_SETTINGS = {

@@ -1,5 +1,5 @@
 import os
-import time
+import datetime
 from io import BytesIO
 
 from django.db.models import F
@@ -31,8 +31,6 @@ from notifications.serializers import NotificationSerializer
 
 from items.tasks import delete_after_expiration, send_item_like_notification
 
-from datetime import timedelta
-
 
 class ItemCreateView(APIView):
     def post(self, request, *args, **kwargs):
@@ -42,23 +40,25 @@ class ItemCreateView(APIView):
         if serializer.is_valid():
             serializer.save(user=request.user)
             if expiration_time[0] == "1D":
-                delete_after_expiration.apply_async(
-                    args=(serializer.instance.id,),
-                    eta=serializer.instance.created_at + timedelta(seconds=30),
+                time_to_delete = serializer.instance.created_at + datetime.timedelta(
+                    seconds=35
                 )
             elif expiration_time[0] == "1W":
-                delete_after_expiration.apply_async(
-                    args=(serializer.instance.id,),
-                    eta=serializer.instance.created_at + timedelta(seconds=50),
+                time_to_delete = serializer.instance.created_at + datetime.timedelta(
+                    seconds=45
                 )
             elif expiration_time[0] == "1Y":
-                delete_after_expiration.apply_async(
-                    args=(serializer.instance.id,),
-                    eta=serializer.instance.created_at + timedelta(seconds=55),
+                time_to_delete = serializer.instance.created_at + datetime.timedelta(
+                    seconds=55
                 )
-                return Response(
-                    {"msg": "Upload item successful..."}, status=status.HTTP_200_OK
-                )
+
+            delete_after_expiration.apply_async(
+                args=(serializer.instance.id,), eta=time_to_delete
+            )
+            return Response(
+                {"msg": "Upload item successful..."}, status=status.HTTP_200_OK
+            )
+        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
