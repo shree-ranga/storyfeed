@@ -42,7 +42,7 @@ class ItemCreateView(APIView):
             serializer.save(user=request.user)
             if expiration_time[0] == "1D":
                 time_to_delete = serializer.instance.created_at + datetime.timedelta(
-                    seconds=35
+                    minutes=30
                 )
             elif expiration_time[0] == "1W":
                 time_to_delete = serializer.instance.created_at + datetime.timedelta(

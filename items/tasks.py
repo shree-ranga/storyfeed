@@ -26,10 +26,12 @@ def delete_after_expiration(item_id):
 def send_item_like_notification(receiver_id, sender_id):
     try:
         devices = APNSDevice.objects.filter(user=receiver_id)
-    except:
-        return "APNS device does not exist"
+    except APNSDevice.DoesNotExist:
+        pass
 
     sender = User.objects.get(id=sender_id)
-    msg = f"{sender.username} ({sender.first_name} {sender.last_name}) liked your post."
+
+    msg = f"{sender.username} ({sender.full_name}) liked your post."
     badge_count = Notification.objects.filter(checked=False).count()
+
     devices.send_message(message={"body": msg}, badge=badge_count)
