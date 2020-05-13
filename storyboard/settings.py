@@ -30,7 +30,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "push_notifications",
-    # "storages",
     # local
     "notifications",
     "accounts",
