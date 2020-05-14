@@ -58,3 +58,6 @@ gunicorn.conf.py
 
 # local nginx
 storyboard_nginx.conf
+
+# env
+.env
