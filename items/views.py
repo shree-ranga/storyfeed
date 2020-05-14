@@ -42,15 +42,15 @@ class ItemCreateView(APIView):
             serializer.save(user=request.user)
             if expiration_time[0] == "1D":
                 time_to_delete = serializer.instance.created_at + datetime.timedelta(
-                    minutes=30
+                    days=1
                 )
             elif expiration_time[0] == "1W":
                 time_to_delete = serializer.instance.created_at + datetime.timedelta(
-                    seconds=45
+                    days=7
                 )
             elif expiration_time[0] == "1Y":
                 time_to_delete = serializer.instance.created_at + datetime.timedelta(
-                    seconds=55
+                    days=365
                 )
 
             delete_after_expiration.apply_async(

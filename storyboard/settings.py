@@ -10,9 +10,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["storyfeed.xyz", "api.storyfeed.xyz", "www.storyfeed.xyz"]
 
 # Custom user model
 AUTH_USER_MODEL = "accounts.User"
@@ -146,7 +146,7 @@ CELERY_ALWAYS_EAGER = False
 PUSH_NOTIFICATIONS_SETTINGS = {
     "APNS_CERTIFICATE": os.path.join(BASE_DIR + "/pushcert.pem"),
     "APNS_TOPIC": "com.storyboard.storyboard",
-    "APNS_USE_ALTERNATIVE_PORT": True,
+    "APNS_USE_ALTERNATIVE_PORT": False,
     "UPDATE_ON_DUPLICATE_REG_ID": True,
     "UNIQUE_REG_ID": True,
 }
