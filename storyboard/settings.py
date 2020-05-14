@@ -7,7 +7,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -72,10 +72,10 @@ WSGI_APPLICATION = "storyboard.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DB_NAME"),  # database name
-        "USER": os.environ.get("DB_USER"),  # master username
-        "PASSWORD": os.environ.get("DB_PASSWORD"),  # master password
-        "HOST": os.environ.get("DB_HOST"),  # db instance
+        "NAME": os.getenv("DB_NAME"),  # database name
+        "USER": os.getenv("DB_USER"),  # master username
+        "PASSWORD": os.getenv("DB_PASSWORD"),  # master password
+        "HOST": os.getenv("DB_HOST"),  # db instance
         "PORT": "5432",  # db port, mostly 5432
     }
 }
@@ -137,7 +137,7 @@ REST_FRAMEWORK = {
 }
 
 # Celery
-CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_ALWAYS_EAGER = False
@@ -152,8 +152,8 @@ PUSH_NOTIFICATIONS_SETTINGS = {
 }
 
 # AWS
-AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 
 # AWS S3
 DEFAULT_FILE_STORAGE = "storyboard.storage_backends.MediaStorage"
