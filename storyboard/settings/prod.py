@@ -146,7 +146,6 @@ CELERY_ALWAYS_EAGER = False
 PUSH_NOTIFICATIONS_SETTINGS = {
     "APNS_CERTIFICATE": os.path.join(BASE_DIR + "/pushcert.pem"),
     "APNS_TOPIC": "com.storyboard.storyboard",
-    "APNS_USE_ALTERNATIVE_PORT": False,
     "UPDATE_ON_DUPLICATE_REG_ID": True,
     "UNIQUE_REG_ID": True,
 }
