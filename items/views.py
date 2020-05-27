@@ -52,7 +52,6 @@ class ItemCreateView(APIView):
                 time_to_delete = serializer.instance.created_at + datetime.timedelta(
                     days=365
                 )
-
             delete_after_expiration.apply_async(
                 args=(serializer.instance.id,), eta=time_to_delete
             )

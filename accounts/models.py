@@ -7,7 +7,9 @@ from notifications.models import Notification
 
 
 class User(AbstractUser):
-    full_name = models.CharField(max_length=1000, null=True, blank=True)
+    full_name = models.CharField(max_length=100, null=True, blank=True)
+    is_private = models.BooleanField(default=False)
+    report_count = models.IntegerField(default=0)
 
     def __str__(self):
         return self.username
@@ -21,6 +23,9 @@ class Profile(models.Model):
     bio = models.CharField(max_length=150, null=True, blank=True)
     followers = models.ManyToManyField(
         "self", symmetrical=False, related_name="following", through="Follow"
+    )
+    blocked_profiles = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, symmetrical=False, related_name="blocked_by"
     )
     updated_at = models.DateTimeField(auto_now=True)
 

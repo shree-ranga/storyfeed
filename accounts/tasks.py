@@ -13,7 +13,7 @@ User = get_user_model()
 def send_follow_push_notification(receiver_id, sender_id):
     try:
         devices = APNSDevice.objects.filter(user=receiver_id)
-    except APNSDevice.DoesNotExist:
+    except APNSDevice.ObjectDoesNotExist:
         pass
 
     sender = User.objects.get(id=sender_id)
@@ -22,3 +22,12 @@ def send_follow_push_notification(receiver_id, sender_id):
     badge_count = Notification.objects.filter(checked=False).count()
 
     devices.send_message(message={"body": msg}, badge=badge_count)
+
+
+@shared_task
+def delete_reported_user(id):
+    try:
+        u = User.objects.get(id=id)
+        u.delete()
+    except:
+        pass

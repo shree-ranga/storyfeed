@@ -13,7 +13,7 @@ User = get_user_model()
 def send_comment_notification(receiver_id, sender_id, comment):
     try:
         devices = APNSDevice.objects.filter(user=receiver_id)
-    except APNSDevice.DoesNotExist:
+    except APNSDevice.ObjectDoesNotExist:
         pass
 
     sender = User.objects.get(id=sender_id)

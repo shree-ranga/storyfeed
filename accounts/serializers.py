@@ -48,7 +48,7 @@ class EditProfileSerializer(serializers.ModelSerializer):
 
 class EditUserSerializer(serializers.ModelSerializer):
     bio = serializers.CharField(required=False)
-    profile = EditProfileSerializer(read_only=True)
+    profile = EditProfileSerializer(required=False)
     avatar = serializers.ImageField(required=False)
 
     class Meta:
@@ -69,10 +69,10 @@ class EditUserSerializer(serializers.ModelSerializer):
         instance.username = validated_data.get("username", instance.username)
         instance.full_name = validated_data.get("full_name", instance.full_name)
         instance.email = validated_data.get("email", instance.email)
-        instance.profile.bio = validated_data.get("bio", instance.profile.bio)
+        instance.profile.bio = validated_data.get("bio", None)
         instance.profile.avatar = validated_data.get("avatar", instance.profile.avatar)
-        instance.save()
         instance.profile.save()
+        instance.save()
         return instance
 
 

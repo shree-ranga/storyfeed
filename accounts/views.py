@@ -29,7 +29,7 @@ User = get_user_model()
 
 class UserListAPI(generics.ListAPIView):
     filter_backends = [SearchFilter]
-    search_fields = ["username", "first_name", "last_name"]
+    search_fields = ["username", "full_name"]
     pagination_class = UserSearchPagination
 
     def get_queryset(self):
@@ -65,9 +65,7 @@ class ProfileAvatarAPI(APIView):
         )
         if serializer.is_valid():
             serializer.save()
-            return Response(
-                {"msg": "Upload successful.."}, status=status.HTTP_201_CREATED
-            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, *args, **kwargs):
@@ -81,6 +79,7 @@ class EditUserView(APIView):
 
     def put(self, request, *args, **kwargs):
         data = request.data
+        print(data)
         serializer = EditUserSerializer(request.user, data=data)
         if serializer.is_valid():
             serializer.save()
