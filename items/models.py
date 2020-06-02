@@ -20,8 +20,13 @@ class Item(models.Model):
     class Meta:
         ordering = ("-created_at",)
 
-    def save(self, *args, **kwargs):
-        return super().save(*args, **kwargs)
+    @property
+    def total_likes(self):
+        return self.item_like.count()
+
+    @property
+    def total_comments(self):
+        return self.item_comments.count()
 
     def __str__(self):
         return f"{self.id} by {self.user.username}"

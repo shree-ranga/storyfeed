@@ -79,7 +79,6 @@ class EditUserView(APIView):
 
     def put(self, request, *args, **kwargs):
         data = request.data
-        print(data)
         serializer = EditUserSerializer(request.user, data=data)
         if serializer.is_valid():
             serializer.save()

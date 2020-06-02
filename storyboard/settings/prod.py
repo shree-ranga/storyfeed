@@ -144,7 +144,7 @@ CELERY_ALWAYS_EAGER = False
 
 # APNs settings
 PUSH_NOTIFICATIONS_SETTINGS = {
-    "APNS_CERTIFICATE": os.path.join(BASE_DIR + "/pushcert.pem"),
+    "APNS_CERTIFICATE": os.path.join(BASE_DIR + "/prod_cert.pem"),
     "APNS_TOPIC": "com.storyboard.storyboard",
     "UPDATE_ON_DUPLICATE_REG_ID": True,
     "UNIQUE_REG_ID": True,

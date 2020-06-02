@@ -14,15 +14,6 @@ User = get_user_model()
 
 
 @shared_task
-def delete_after_expiration(item_id):
-    try:
-        i = Item.objects.get(id=item_id)
-        i.delete()
-    except Item.ObjectDoesNotExist:
-        pass
-
-
-@shared_task
 def send_item_like_notification(receiver_id, sender_id):
     try:
         devices = APNSDevice.objects.filter(user=receiver_id)
@@ -31,14 +22,36 @@ def send_item_like_notification(receiver_id, sender_id):
 
     sender = User.objects.get(id=sender_id)
 
-    msg = f"{sender.username} ({sender.full_name}) liked your post."
+    msg = f"{sender.username} ({sender.full_name}) liked your story!"
     badge_count = Notification.objects.filter(checked=False).count()
 
     devices.send_message(message={"body": msg}, badge=badge_count)
 
 
 @shared_task
+def send_item_create_notification(follower_ids, sender_id):
+    try:
+        devices = APNSDevice.objects.filter(user__in=follower_ids)
+    except:
+        pass
+
+    sender = User.objects.get(id=sender_id)
+
+    msg = f"{sender.username} just posted a new story!"
+    devices.send_message(message={"body": msg}, category="item")
+
+
+@shared_task
 def delete_reported_item(item_id):
+    try:
+        i = Item.objects.get(id=item_id)
+        i.delete()
+    except Item.ObjectDoesNotExist:
+        pass
+
+
+@shared_task
+def delete_after_expiration(item_id):
     try:
         i = Item.objects.get(id=item_id)
         i.delete()

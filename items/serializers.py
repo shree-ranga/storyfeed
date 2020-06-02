@@ -27,14 +27,8 @@ class ItemListSerializer(serializers.ModelSerializer):
 
 class ItemDetailSerializer(serializers.ModelSerializer):
     user = UserListSerializer()
-    likes_count = serializers.SerializerMethodField()
-    comments_count = serializers.SerializerMethodField()
-
-    def get_likes_count(self, obj):
-        return obj.item_like.count()
-
-    def get_comments_count(self, obj):
-        return obj.item_comments.count()
+    likes_count = serializers.ReadOnlyField(source="total_likes")
+    comments_count = serializers.ReadOnlyField(source="total_comments")
 
     class Meta:
         model = Item

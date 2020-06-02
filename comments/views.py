@@ -42,7 +42,6 @@ class CommentCreateView(APIView):
                 # else:
                 #     return "Could not save notification object"
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -60,3 +59,12 @@ class CommentListView(generics.ListAPIView):
 
     def get_serializer_class(self):
         return CommentListSerializer
+
+
+class CommentDeleteView(APIView):
+    def delete(self, request, *args, **kwargs):
+        pass
+
+
+class CommentReportView(APIView):
+    pass

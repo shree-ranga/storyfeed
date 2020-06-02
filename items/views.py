@@ -27,14 +27,18 @@ from .pagination import (
     FeedPagination,
 )
 from .permissions import IsOwnerOrAdmin
+from .tasks import (
+    send_item_create_notification,
+    send_item_like_notification,
+    delete_after_expiration,
+)
 
 from notifications.serializers import NotificationSerializer
-
-from items.tasks import delete_after_expiration, send_item_like_notification
 
 
 class ItemCreateView(APIView):
     def post(self, request, *args, **kwargs):
+        follower_ids = list(request.user.profile.followers.all().values_list(flat=True))
         item = self.request.data.get("item")
         expiration_time = self.request.data.pop("expiration_time")
         serializer = ItemCreateSerializer(data={"item": item})
@@ -55,10 +59,12 @@ class ItemCreateView(APIView):
             delete_after_expiration.apply_async(
                 args=(serializer.instance.id,), eta=time_to_delete
             )
+            send_item_create_notification.delay(
+                follower_ids=follower_ids, sender_id=serializer.instance.user.id
+            )
             return Response(
                 {"msg": "Upload item successful..."}, status=status.HTTP_200_OK
             )
-        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
