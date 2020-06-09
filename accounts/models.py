@@ -24,6 +24,7 @@ class Profile(models.Model):
     followers = models.ManyToManyField(
         "self", symmetrical=False, related_name="following", through="Follow"
     )
+    all_likes = models.IntegerField(default=0)
     blocked_profiles = models.ManyToManyField(
         settings.AUTH_USER_MODEL, symmetrical=False, related_name="blocked_by"
     )

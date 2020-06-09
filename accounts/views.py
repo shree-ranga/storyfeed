@@ -8,8 +8,6 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.filters import SearchFilter
 from rest_framework import generics
 
-from django_redis import get_redis_connection
-
 from .serializers import (
     UserListSerializer,
     UserDetailSerializer,
@@ -33,8 +31,7 @@ class UserListAPI(generics.ListAPIView):
     pagination_class = UserSearchPagination
 
     def get_queryset(self):
-        user_list = User.objects.all()
-        return user_list
+        return User.objects.all()
 
     def get_serializer(self, *args, **kwargs):
         serializer_class = self.get_serializer_class()
@@ -58,6 +55,7 @@ class UserDetailAPI(APIView):
 class ProfileAvatarAPI(APIView):
     def patch(self, request, *args, **kwargs):
         data = request.data
+        print(data)
         avatar = data.get("avatar")
         profile = request.user.profile
         serializer = ProfileAvatarSerializer(

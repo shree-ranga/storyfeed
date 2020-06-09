@@ -63,7 +63,6 @@ class RegisterAPI(APIView):
                     "username": token.user.username,
                     "fullname": token.user.full_name,
                     "email": token.user.email,
-                    "avatar": token.user.profile.avatar_url,
                 },
                 status=status.HTTP_201_CREATED,
             )
@@ -79,8 +78,6 @@ class LoginAPI(APIView):
         if serializer.is_valid():
             user = serializer.validated_data.get("user")
             token, created = Token.objects.get_or_create(user=user)
-            if token.user.profile.avatar is None:
-                print("No avatar")
             return Response(
                 {
                     "token": token.key,
@@ -90,8 +87,6 @@ class LoginAPI(APIView):
                     "email": token.user.email,
                     "avatar": token.user.profile.avatar_url,
                     "bio": token.user.profile.bio,
-                    "followers_count": token.user.profile.followers_count,
-                    "following_count": token.user.profile.following_count,
                 },
                 status=status.HTTP_200_OK,
             )
@@ -115,7 +110,7 @@ class ChangePasswordAPI(APIView):
         serializer = PasswordChangeSerializer(user, data=data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

@@ -1,10 +1,10 @@
 import os
 import datetime
-from io import BytesIO
 
 from django.db.models import F
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
+from django.conf import settings
 
 from rest_framework.views import APIView
 from rest_framework import generics
@@ -13,6 +13,8 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 
 from PIL import Image
+
+import boto3
 
 from .models import Item, Like
 from .serializers import (
@@ -27,44 +29,34 @@ from .pagination import (
     FeedPagination,
 )
 from .permissions import IsOwnerOrAdmin
-from .tasks import (
-    send_item_create_notification,
-    send_item_like_notification,
-    delete_after_expiration,
-)
+from .tasks import send_item_like_notification, delete_item
 
 from notifications.serializers import NotificationSerializer
+
+from storyboard.storage_backends import MediaStorage
+
+User = get_user_model()
 
 
 class ItemCreateView(APIView):
     def post(self, request, *args, **kwargs):
-        follower_ids = list(request.user.profile.followers.all().values_list(flat=True))
-        item = self.request.data.get("item")
-        expiration_time = self.request.data.pop("expiration_time")
+        item = request.data.get("item")
+        expiration_time = request.data.pop("expiration_time")
+
         serializer = ItemCreateSerializer(data={"item": item})
         if serializer.is_valid():
             serializer.save(user=request.user)
+
+            created_at = serializer.instance.created_at
             if expiration_time[0] == "1D":
-                time_to_delete = serializer.instance.created_at + datetime.timedelta(
-                    days=1
-                )
-            elif expiration_time[0] == "1W":
-                time_to_delete = serializer.instance.created_at + datetime.timedelta(
-                    days=7
-                )
+                time_to_delete = created_at + datetime.timedelta(days=1)
+            elif expiration_time[0] == "1M":
+                time_to_delete = created_at + datetime.timedelta(days=7)
             elif expiration_time[0] == "1Y":
-                time_to_delete = serializer.instance.created_at + datetime.timedelta(
-                    days=365
-                )
-            delete_after_expiration.apply_async(
-                args=(serializer.instance.id,), eta=time_to_delete
-            )
-            send_item_create_notification.delay(
-                follower_ids=follower_ids, sender_id=serializer.instance.user.id
-            )
-            return Response(
-                {"msg": "Upload item successful..."}, status=status.HTTP_200_OK
-            )
+                time_to_delete = created_at + datetime.timedelta(days=365)
+
+            delete_item.apply_async(args=(serializer.instance.id,), eta=time_to_delete)
+            return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -126,9 +118,11 @@ class LikeItemView(APIView):
     def post(self, request, *args, **kwargs):
         item_id = request.data.get("post_id")
         data = {"item": item_id}
+
         serializer = LikeSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)
+
             if serializer.instance.user != serializer.instance.item.user:
                 notification_data = {
                     "receiver": serializer.instance.item.user.id,
@@ -169,16 +163,14 @@ class CheckItemLikeView(APIView):
 
 class ItemDeleteView(APIView):
     permission_classes = [IsOwnerOrAdmin]
-    # TODO: - make this a celery task
+
     def delete(self, request, *args, **kwargs):
         item_id = request.query_params.get("post_id")
-        item = Item.objects.get(id=item_id)
-        item.delete()
+        delete_item.delay(item_id)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ReportItemView(APIView):
-    # TODO: - run a periodic task to monitor reports
     def post(self, request, *args, **kwargs):
         item_id = request.data.get("post_id")
         item = Item.objects.get(id=item_id)

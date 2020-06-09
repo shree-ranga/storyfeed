@@ -160,6 +160,6 @@ AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 # AWS S3
 DEFAULT_FILE_STORAGE = "storyboard.storage_backends.MediaStorage"
 AWS_S3_REGION_NAME = "us-east-2"  # e.g. us-east-2
-AWS_STORAGE_BUCKET_NAME = "storyfeed-remote-s3-test"
+AWS_STORAGE_BUCKET_NAME = "storyfeed-dev-bucket"
 AWS_DEFAULT_ACL = None
-AWS_S3_CUSTOM_DOMAIN = "d1jb0mkjj1vmul.cloudfront.net"
+AWS_S3_CUSTOM_DOMAIN = "storyfeed-dev-bucket.s3.us-east-2.amazonaws.com"

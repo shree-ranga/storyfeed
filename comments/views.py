@@ -7,10 +7,10 @@ from rest_framework.exceptions import ValidationError
 from .models import Comment
 from .serializers import CommentCreateSerializer, CommentListSerializer
 from .pagination import CommentPagination
+from .tasks import send_comment_notification
+from .permissions import IsOwnerOrAdmin
 
 from items.models import Item
-
-from .tasks import send_comment_notification
 
 from notifications.serializers import NotificationSerializer
 
@@ -62,8 +62,13 @@ class CommentListView(generics.ListAPIView):
 
 
 class CommentDeleteView(APIView):
+    permission_classes = [IsOwnerOrAdmin]
+
     def delete(self, request, *args, **kwargs):
-        pass
+        comment_id = request.query_params.get("comment_id")
+        i = Comment.objects.get(id=comment_id)
+        i.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CommentReportView(APIView):
