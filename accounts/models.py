@@ -19,7 +19,6 @@ class Profile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, primary_key=True, on_delete=models.CASCADE
     )
-    avatar = models.ImageField(null=True, blank=True, upload_to="profileImages")
     bio = models.CharField(max_length=150, null=True, blank=True)
     followers = models.ManyToManyField(
         "self", symmetrical=False, related_name="following", through="Follow"
@@ -31,10 +30,10 @@ class Profile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         from .tasks import process_avatar_image
 
-        super().save(*args, **kwargs)
-        processed_img = process_avatar_image.delay(self.user.id)
+        process_avatar_image.delay(self.user.id)
 
     @property
     def followers_count(self):
@@ -43,13 +42,6 @@ class Profile(models.Model):
     @property
     def following_count(self):
         return self.following.count()
-
-    @property
-    def avatar_url(self):
-        try:
-            return self.avatar.url
-        except:
-            return None
 
     def __str__(self):
         return f"{self.user.username}'s profile"
@@ -71,3 +63,24 @@ class Follow(models.Model):
 
     def __str__(self):
         return f"{self.follower_user} is following {self.following_user}"
+
+
+class ProfileAvatar(models.Model):
+    profile = models.OneToOneField(Profile, primary_key=True, on_delete=models.CASCADE)
+    avatar = models.ImageField(null=True, blank=True, upload_to="profileImages")
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        from .tasks import process_avatar_image
+
+        process_avatar_image.delay(self.profile.user.id)
+
+    @property
+    def avatar_url(self):
+        try:
+            return self.avatar.url
+        except:
+            return None
+
+    def __str__(self):
+        return f"{self.avatar.name} {self.profile.user.username}"

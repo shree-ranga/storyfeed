@@ -2,36 +2,42 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 
-from .models import Profile, Follow
+from .models import Profile, Follow, ProfileAvatar
 
 User = get_user_model()
 
 
 class ProfileAvatarSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Profile
+        model = ProfileAvatar
         fields = ["avatar"]
-
-    def update(self, instance, validated_data):
-        return super().update(instance, validated_data)
-
-
-class UserListSerializer(serializers.ModelSerializer):
-    profile = ProfileAvatarSerializer(required=False, many=False)
-
-    class Meta:
-        model = User
-        fields = ["id", "username", "full_name", "profile"]
-        read_only_fields = ["id"]
 
 
 class ProfileDetailSerializer(serializers.ModelSerializer):
     total_followers = serializers.ReadOnlyField(source="followers_count")
     total_following = serializers.ReadOnlyField(source="following_count")
+    profileavatar = ProfileAvatarSerializer(required=False, many=False)
 
     class Meta:
         model = Profile
-        fields = ["avatar", "bio", "total_followers", "total_following"]
+        fields = ["bio", "total_followers", "total_following", "profileavatar"]
+
+
+class ProfilePicSerializer(serializers.ModelSerializer):
+    profileavatar = ProfileAvatarSerializer(required=False, many=False)
+
+    class Meta:
+        model = Profile
+        fields = ["profileavatar"]
+
+
+class UserListSerializer(serializers.ModelSerializer):
+    profile = ProfilePicSerializer(required=False, many=False)
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "full_name", "profile"]
+        read_only_fields = ["id"]
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
@@ -43,16 +49,15 @@ class UserDetailSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
-class EditProfileSerializer(serializers.ModelSerializer):
+class ProfileBioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ["avatar", "bio"]
+        fields = ["bio"]
 
 
 class EditUserSerializer(serializers.ModelSerializer):
     bio = serializers.CharField(required=False)
-    profile = EditProfileSerializer(required=False)
-    avatar = serializers.ImageField(required=False)
+    profile = ProfileBioSerializer(required=False)
 
     class Meta:
         model = User
@@ -62,7 +67,6 @@ class EditUserSerializer(serializers.ModelSerializer):
             "full_name",
             "bio",
             "profile",
-            "avatar",
             "email",
         ]
         read_only_fields = ["id"]
@@ -73,9 +77,8 @@ class EditUserSerializer(serializers.ModelSerializer):
         instance.full_name = validated_data.get("full_name", instance.full_name)
         instance.email = validated_data.get("email", instance.email)
         instance.profile.bio = validated_data.get("bio", None)
-        instance.profile.avatar = validated_data.get("avatar", instance.profile.avatar)
-        instance.profile.save()
         instance.save()
+        instance.profile.save()
         return instance
 
 

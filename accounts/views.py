@@ -21,10 +21,10 @@ from .serializers import (
     FollowSerializer,
     EditUserSerializer,
 )
-from .models import Follow
+from .models import Follow, ProfileAvatar
 from .pagination import UserSearchPagination, UserFollowerFollowingPagination
 from .permissions import IsOwnerOrAdmin
-from .tasks import send_follow_push_notification
+from .tasks import send_follow_push_notification, delete_profile_avatar
 
 from notifications.serializers import NotificationSerializer
 
@@ -59,21 +59,28 @@ class UserDetailAPI(APIView):
 
 
 class ProfileAvatarAPI(APIView):
-    def patch(self, request, *args, **kwargs):
-        data = request.data
-        avatar = data.get("avatar")
-        profile = request.user.profile
-        serializer = ProfileAvatarSerializer(
-            profile, data={"avatar": avatar}, partial=True
-        )
+    def post(self, request, *args, **kwargs):
+        avatar = request.data.get("avatar")
+        serializer = ProfileAvatarSerializer(data={"avatar": avatar})
+        if serializer.is_valid():
+            serializer.save(profile=request.user.profile)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, *args, **kwargs):
+        profile = self.request.user.profile
+        avatar_instance = ProfileAvatar(profile=profile)
+        avatar = request.data.get("avatar")
+        serializer = ProfileAvatarSerializer(avatar_instance, data={"avatar": avatar})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, *args, **kwargs):
-        profile_avatar = request.user.profile.avatar
+        profile_avatar = request.user.profile.profileavatar
         profile_avatar.delete()
+        delete_profile_avatar.delay(request.user.id)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

@@ -85,7 +85,7 @@ class LoginAPI(APIView):
                     "username": token.user.username,
                     "fullname": token.user.full_name,
                     "email": token.user.email,
-                    "avatar": token.user.profile.avatar_url,
+                    "avatar": token.user.profile.profileavatar.avatar_url,
                     "bio": token.user.profile.bio,
                 },
                 status=status.HTTP_200_OK,
