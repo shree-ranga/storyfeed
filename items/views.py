@@ -1,20 +1,14 @@
-import os
 import datetime
+import calendar
 
 from django.db.models import F
 from django.contrib.auth import get_user_model
-from django.core.files.base import ContentFile
 from django.conf import settings
 
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.exceptions import ValidationError
-
-from PIL import Image
-
-import boto3
 
 from .models import Item, Like
 from .serializers import (
@@ -53,9 +47,12 @@ class ItemCreateView(APIView):
             elif expiration_time[0] == "1M":
                 time_to_delete = created_at + datetime.timedelta(days=7)
             elif expiration_time[0] == "1Y":
-                time_to_delete = created_at + datetime.timedelta(days=365)
-
+                if calendar.isleap(datetime.datetime.now().year):
+                    time_to_delete = created_at + datetime.timedelta(days=366)
+                else:
+                    time_to_delete = created_at + datetime.timedelta(days=365)
             delete_item.apply_async(args=(serializer.instance.id,), eta=time_to_delete)
+
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

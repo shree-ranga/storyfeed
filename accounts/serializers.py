@@ -12,6 +12,9 @@ class ProfileAvatarSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ["avatar"]
 
+    def update(self, instance, validated_data):
+        return super().update(instance, validated_data)
+
 
 class UserListSerializer(serializers.ModelSerializer):
     profile = ProfileAvatarSerializer(required=False, many=False)

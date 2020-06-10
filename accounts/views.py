@@ -1,5 +1,9 @@
+import os
+
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -7,6 +11,8 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.filters import SearchFilter
 from rest_framework import generics
+
+from PIL import Image
 
 from .serializers import (
     UserListSerializer,
@@ -55,7 +61,6 @@ class UserDetailAPI(APIView):
 class ProfileAvatarAPI(APIView):
     def patch(self, request, *args, **kwargs):
         data = request.data
-        print(data)
         avatar = data.get("avatar")
         profile = request.user.profile
         serializer = ProfileAvatarSerializer(

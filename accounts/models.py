@@ -19,7 +19,7 @@ class Profile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, primary_key=True, on_delete=models.CASCADE
     )
-    avatar = models.ImageField(null=True, blank=True)
+    avatar = models.ImageField(null=True, blank=True, upload_to="profileImages")
     bio = models.CharField(max_length=150, null=True, blank=True)
     followers = models.ManyToManyField(
         "self", symmetrical=False, related_name="following", through="Follow"
@@ -29,6 +29,12 @@ class Profile(models.Model):
         settings.AUTH_USER_MODEL, symmetrical=False, related_name="blocked_by"
     )
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        from .tasks import process_avatar_image
+
+        super().save(*args, **kwargs)
+        processed_img = process_avatar_image.delay(self.user.id)
 
     @property
     def followers_count(self):
@@ -65,3 +71,7 @@ class Follow(models.Model):
 
     def __str__(self):
         return f"{self.follower_user} is following {self.following_user}"
+
+
+class DummyProfilePic(models.Model):
+    pass

@@ -1,12 +1,32 @@
+from io import BytesIO
+
 from django.contrib.auth import get_user_model
+from django.core.files.storage import default_storage
 
 from celery import shared_task
 
 from push_notifications.models import APNSDevice
 
+from PIL import Image
+
 from notifications.models import Notification
 
 User = get_user_model()
+
+
+@shared_task
+def process_avatar_image(user_id):
+    try:
+        memfile = BytesIO()
+        user = User.objects.get(id=user_id)
+        i = Image.open(user.profile.avatar)
+        i.thumbnail(size=(300, 450))
+        i.save(memfile, "JPEG")
+        default_storage.save(user.profile.avatar.name, memfile)
+        memfile.close()
+        i.close()
+    except:
+        pass
 
 
 @shared_task
