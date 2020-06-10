@@ -71,7 +71,3 @@ class Follow(models.Model):
 
     def __str__(self):
         return f"{self.follower_user} is following {self.following_user}"
-
-
-class DummyProfilePic(models.Model):
-    pass
