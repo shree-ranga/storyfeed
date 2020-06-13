@@ -111,7 +111,7 @@ class UserFeedView(generics.ListAPIView):
         return ItemDetailSerializer
 
 
-class LikeItemView(APIView):
+class LikeUnlikeItemView(APIView):
     def post(self, request, *args, **kwargs):
         item_id = request.data.get("post_id")
         data = {"item": item_id}
@@ -119,6 +119,11 @@ class LikeItemView(APIView):
         serializer = LikeSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)
+
+            user = User.objects.get(id=serializer.instance.item.user.id)
+            user.profile.total_likes += 1
+            user.profile.save()
+            user.save()
 
             if serializer.instance.user != serializer.instance.item.user:
                 notification_data = {
@@ -134,18 +139,20 @@ class LikeItemView(APIView):
                         receiver_id=notification_serializer.instance.receiver_id,
                         sender_id=notification_serializer.instance.sender_id,
                     )
-                # else:
-                #     return "Could not save notification object"
-            return Response({"msg": "Like created..."}, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class UnlikeItemView(APIView):
-    def post(self, request, *args, **kwargs):
-        item_id = request.data.get("post_id")
+    def delete(self, request, *args, **kwargs):
+        item_id = request.query_params.get("post_id")
         user_id = request.user.id
         like_instance = Like.objects.get(item=item_id, user=user_id)
         like_instance.delete()
+
+        item = Item.objects.get(id=item_id)
+        item_user = User.objects.get(id=item.user.id)
+        item_user.profile.total_likes -= 1
+        item_user.profile.save()
+        item_user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

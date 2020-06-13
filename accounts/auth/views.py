@@ -14,7 +14,7 @@ from .serializers import (
     RegisterSerializer,
     PasswordChangeSerializer,
 )
-from accounts.models import Profile
+from accounts.models import Profile, ProfileAvatar
 
 User = get_user_model()
 
@@ -78,6 +78,10 @@ class LoginAPI(APIView):
         if serializer.is_valid():
             user = serializer.validated_data.get("user")
             token, created = Token.objects.get_or_create(user=user)
+            if ProfileAvatar.objects.filter(profile=user.profile).exists():
+                useravatar = token.user.profile.profileavatar.avatar_url
+            else:
+                useravatar = None
             return Response(
                 {
                     "token": token.key,
@@ -85,7 +89,7 @@ class LoginAPI(APIView):
                     "username": token.user.username,
                     "fullname": token.user.full_name,
                     "email": token.user.email,
-                    "avatar": token.user.profile.profileavatar.avatar_url,
+                    "avatar": useravatar,
                     "bio": token.user.profile.bio,
                 },
                 status=status.HTTP_200_OK,
