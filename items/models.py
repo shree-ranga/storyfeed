@@ -12,10 +12,11 @@ class Item(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="item_by"
     )
     item = models.ImageField(null=True, blank=True)
-    report_counter = models.IntegerField(default=0)
-    notifications = GenericRelation(Notification)
+    expiry_time = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    report_counter = models.IntegerField(default=0)
+    notifications = GenericRelation(Notification)
 
     class Meta:
         ordering = ("-created_at",)

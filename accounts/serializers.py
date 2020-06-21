@@ -20,7 +20,13 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ["bio", "total_followers", "total_following", "profileavatar"]
+        fields = [
+            "bio",
+            "total_followers",
+            "total_following",
+            "profileavatar",
+            "total_likes",
+        ]
 
 
 class ProfilePicSerializer(serializers.ModelSerializer):

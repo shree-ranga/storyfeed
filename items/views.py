@@ -145,14 +145,15 @@ class LikeUnlikeItemView(APIView):
     def delete(self, request, *args, **kwargs):
         item_id = request.query_params.get("post_id")
         user_id = request.user.id
-        like_instance = Like.objects.get(item=item_id, user=user_id)
-        like_instance.delete()
 
         item = Item.objects.get(id=item_id)
         item_user = User.objects.get(id=item.user.id)
         item_user.profile.total_likes -= 1
         item_user.profile.save()
         item_user.save()
+
+        like_instance = Like.objects.get(item=item_id, user=user_id)
+        like_instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

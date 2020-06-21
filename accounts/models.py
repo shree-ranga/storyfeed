@@ -23,17 +23,11 @@ class Profile(models.Model):
     followers = models.ManyToManyField(
         "self", symmetrical=False, related_name="following", through="Follow"
     )
-    total_likes = models.IntegerField(default=0)
+    total_likes = models.PositiveIntegerField(default=0)
     blocked_profiles = models.ManyToManyField(
         settings.AUTH_USER_MODEL, symmetrical=False, related_name="blocked_by"
     )
     updated_at = models.DateTimeField(auto_now=True)
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        from .tasks import process_avatar_image
-
-        process_avatar_image.delay(self.user.id)
 
     @property
     def followers_count(self):

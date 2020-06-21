@@ -1,7 +1,11 @@
 from rest_framework import serializers
 
 from accounts.serializers import UserListSerializer
-from items.serializers import ItemDetailSerializer, ItemListSerializer
+from items.serializers import (
+    ItemDetailSerializer,
+    ItemListSerializer,
+    ItemCommentListSerializer,
+)
 from .models import Comment
 
 
@@ -17,11 +21,12 @@ class CommentCreateSerializer(serializers.ModelSerializer):
 
 class CommentListSerializer(serializers.ModelSerializer):
     user = UserListSerializer()
+    item = ItemCommentListSerializer()
 
     class Meta:
         model = Comment
-        fields = ["id", "comment", "user", "created_at"]
-        read_only_fields = ["id", "user"]
+        fields = ["id", "comment", "user", "created_at", "item"]
+        read_only_fields = ["id", "user", "item"]
 
 
 class CommentNotificationSerializer(serializers.ModelSerializer):

@@ -43,6 +43,13 @@ class ItemDetailSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "user"]
 
 
+class ItemCommentListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Item
+        fields = ["id"]
+        read_only_fields = ["id"]
+
+
 class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
