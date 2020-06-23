@@ -4,7 +4,7 @@ from rest_framework import status
 
 
 class UserSearchPagination(LimitOffsetPagination):
-    default_limit = 15
+    default_limit = 45
 
     # TODO: - customize the paginated response
     def get_paginated_response(self, data):
@@ -12,7 +12,7 @@ class UserSearchPagination(LimitOffsetPagination):
 
 
 class UserFollowerFollowingPagination(LimitOffsetPagination):
-    default_limit = 3
+    default_limit = 30
 
     def get_paginated_response(self, data):
         return Response(

@@ -61,6 +61,7 @@ def send_item_like_notification(receiver_id, sender_id):
 #         pass
 
 
+# TODO: - move this inside model
 @shared_task
 def delete_item(item_id):
     try:

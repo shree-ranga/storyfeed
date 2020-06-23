@@ -4,7 +4,7 @@ from rest_framework import status
 
 
 class CommentPagination(LimitOffsetPagination):
-    default_limit = 5
+    default_limit = 20
 
     def get_paginated_response(self, data):
         return Response(

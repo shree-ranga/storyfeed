@@ -4,7 +4,7 @@ from rest_framework import status
 
 
 class FeedPagination(LimitOffsetPagination):
-    default_limit = 5
+    default_limit = 30
 
     def get_paginated_response(self, data):
         return Response(
@@ -13,7 +13,7 @@ class FeedPagination(LimitOffsetPagination):
 
 
 class SearchItemListPagination(LimitOffsetPagination):
-    default_limit = 9
+    default_limit = 30
 
     def get_paginated_response(self, data):
         return Response(
@@ -22,7 +22,7 @@ class SearchItemListPagination(LimitOffsetPagination):
 
 
 class UserItemListPagination(LimitOffsetPagination):
-    default_limit = 9
+    default_limit = 30
 
     def get_paginated_response(self, data):
         return Response(
