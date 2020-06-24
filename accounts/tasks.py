@@ -41,8 +41,10 @@ def send_follow_push_notification(receiver_id, sender_id):
 
     sender = User.objects.get(id=sender_id)
 
-    msg = f"{sender.username} {(sender.full_name)} started following you!"
-    badge_count = Notification.objects.filter(checked=False).count()
+    msg = f"{sender.username} ({sender.full_name}) started following you!"
+    badge_count = Notification.objects.filter(
+        receiver=receiver_id, checked=False
+    ).count()
 
     devices.send_message(message={"body": msg}, badge=badge_count)
 

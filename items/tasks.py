@@ -13,7 +13,7 @@ from items.models import Item
 
 from notifications.models import Notification
 
-from storyboard.storage_backends import MediaStorage
+from django.core.files.storage import default_storage
 
 User = get_user_model()
 # r = redis.StrictRedis(db=1, decode_responses=True)
@@ -29,7 +29,9 @@ def send_item_like_notification(receiver_id, sender_id):
     sender = User.objects.get(id=sender_id)
 
     msg = f"{sender.username} ({sender.full_name}) liked your story!"
-    badge_count = Notification.objects.filter(checked=False).count()
+    badge_count = Notification.objects.filter(
+        checked=False, receiver=receiver_id
+    ).count()
 
     devices.send_message(message={"body": msg}, badge=badge_count)
 
@@ -68,7 +70,8 @@ def delete_item(item_id):
         i = Item.objects.get(id=item_id)
         s3_resource = boto3.resource("s3")
         s3_resource.Object(
-            settings.AWS_STORAGE_BUCKET_NAME, f"{MediaStorage.location}/{i.item.name}"
+            settings.AWS_STORAGE_BUCKET_NAME,
+            f"{default_storage.location}/{i.item.name}",
         ).delete()
         i.delete()
     except:

@@ -19,6 +19,8 @@ def send_comment_notification(receiver_id, sender_id, comment):
     sender = User.objects.get(id=sender_id)
 
     msg = f"""{sender.username} commented: "{comment}" on your story."""
-    badge_count = Notification.objects.filter(checked=False).count()
+    badge_count = Notification.objects.filter(
+        checked=False, receiver=receiver_id
+    ).count()
 
     devices.send_message(message={"body": msg}, badge=badge_count)
