@@ -19,7 +19,7 @@ from .serializers import (
 )
 from .pagination import (
     UserItemListPagination,
-    SearchItemListPagination,
+    ExploreItemListPagination,
     FeedPagination,
 )
 from .permissions import IsOwnerOrAdmin
@@ -57,7 +57,6 @@ class ItemCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# TODO: - refactor. Change query params to args
 class UserItemListDetailView(generics.ListAPIView):
     pagination_class = UserItemListPagination
 
@@ -76,7 +75,7 @@ class UserItemListDetailView(generics.ListAPIView):
 
 
 class ExploreItemsView(generics.ListAPIView):
-    pagination_class = SearchItemListPagination
+    pagination_class = ExploreItemListPagination
 
     def get_queryset(self):
         user = self.request.user
@@ -135,6 +134,7 @@ class LikeUnlikeItemView(APIView):
                 notification_serializer = NotificationSerializer(data=notification_data)
                 if notification_serializer.is_valid():
                     notification_serializer.save()
+
                     send_item_like_notification.delay(
                         receiver_id=notification_serializer.instance.receiver_id,
                         sender_id=notification_serializer.instance.sender_id,
@@ -184,6 +184,6 @@ class ReportItemView(APIView):
         return Response(status=status.HTTP_201_CREATED)
 
 
-# class to direct upload from Frontend
+# s3 signature to direct upload from Frontend
 class AwsS3SignatureAPI(APIView):
     pass

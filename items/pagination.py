@@ -12,7 +12,7 @@ class FeedPagination(LimitOffsetPagination):
         )
 
 
-class SearchItemListPagination(LimitOffsetPagination):
+class ExploreItemListPagination(LimitOffsetPagination):
     default_limit = 30
 
     def get_paginated_response(self, data):
