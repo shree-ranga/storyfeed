@@ -21,3 +21,6 @@ class Comment(models.Model):
     def __str__(self):
         return f"{self.comment} by {self.user.username} on post {self.item.id}"
 
+
+class CommentLike(models.Model):
+    pass

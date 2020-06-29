@@ -3,15 +3,18 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
 
 from .models import Notification
+
 from accounts.models import Follow
-from items.models import Like
-from comments.models import Comment
-from comments.serializers import CommentNotificationSerializer
 from accounts.serializers import (
     FollowNotificationSerialzier,
     UserNotificationSerializer,
 )
+
+from items.models import Like
 from items.serializers import LikeNotificationSerializer
+
+from comments.models import Comment
+from comments.serializers import CommentNotificationSerializer
 
 
 class NotifiedObjectRelatedField(serializers.RelatedField):

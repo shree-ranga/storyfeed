@@ -24,6 +24,7 @@ class CommentCreateView(APIView):
         serializer = CommentCreateSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user, item=item)
+
             if serializer.instance.user != serializer.instance.item.user:
                 notification_data = {
                     "receiver": serializer.instance.item.user.id,
@@ -34,13 +35,12 @@ class CommentCreateView(APIView):
                 notification_serializer = NotificationSerializer(data=notification_data)
                 if notification_serializer.is_valid():
                     notification_serializer.save()
+
                     send_comment_notification.delay(
                         receiver_id=notification_serializer.instance.receiver_id,
                         sender_id=notification_serializer.instance.sender_id,
                         comment=serializer.instance.comment,
                     )
-                # else:
-                #     return "Could not save notification object"
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

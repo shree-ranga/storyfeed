@@ -25,8 +25,8 @@ class NotificationListView(generics.ListAPIView):
 
 class CheckNotificationStatus(APIView):
     def get(self, request, *args, **kwargs):
-        n = Notification.objects.filter(checked=False, receiver=request.user)
-        if n.exists():
+        notification = Notification.objects.filter(checked=False, receiver=request.user)
+        if notification.exists():
             return Response({"checked": False}, status=status.HTTP_200_OK)
         else:
             return Response({"checked": True}, status=status.HTTP_200_OK)
