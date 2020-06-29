@@ -1,15 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.contrib.contenttypes.fields import GenericRelation
 from django.conf import settings
-
-from notifications.models import Notification
 
 
 class User(AbstractUser):
     full_name = models.CharField(max_length=100, null=True, blank=True)
-    is_private = models.BooleanField(default=False)
-    report_count = models.IntegerField(default=0)
 
     def __str__(self):
         return self.username
@@ -24,9 +19,11 @@ class Profile(models.Model):
         "self", symmetrical=False, related_name="following", through="Follow"
     )
     total_likes = models.PositiveIntegerField(default=0)
+    is_private = models.BooleanField(default=False)
     blocked_profiles = models.ManyToManyField(
         settings.AUTH_USER_MODEL, symmetrical=False, related_name="blocked_by"
     )
+    report_count = models.IntegerField(default=0)
     updated_at = models.DateTimeField(auto_now=True)
 
     @property
@@ -41,7 +38,6 @@ class Profile(models.Model):
         return f"{self.user.username}'s profile"
 
 
-# Through table for followers in profile
 class Follow(models.Model):
     following_user = models.ForeignKey(
         Profile, related_name="follower_user", on_delete=models.CASCADE
@@ -50,7 +46,6 @@ class Follow(models.Model):
         Profile, related_name="following_user", on_delete=models.CASCADE
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    notifications = GenericRelation(Notification)
 
     class Meta:
         unique_together = ("following_user", "follower_user")
@@ -77,4 +72,4 @@ class ProfileAvatar(models.Model):
             return None
 
     def __str__(self):
-        return f"{self.avatar.name} {self.profile.user.username}"
+        return f"{self.profile.user.username}'s {self.avatar.name} avatar"

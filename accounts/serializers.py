@@ -13,22 +13,6 @@ class ProfileAvatarSerializer(serializers.ModelSerializer):
         fields = ["avatar"]
 
 
-class ProfileDetailSerializer(serializers.ModelSerializer):
-    total_followers = serializers.ReadOnlyField(source="followers_count")
-    total_following = serializers.ReadOnlyField(source="following_count")
-    profileavatar = ProfileAvatarSerializer(required=False, many=False)
-
-    class Meta:
-        model = Profile
-        fields = [
-            "bio",
-            "total_followers",
-            "total_following",
-            "profileavatar",
-            "total_likes",
-        ]
-
-
 class ProfilePicSerializer(serializers.ModelSerializer):
     profileavatar = ProfileAvatarSerializer(required=False, many=False)
 
@@ -46,6 +30,22 @@ class UserListSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
+class ProfileDetailSerializer(serializers.ModelSerializer):
+    total_followers = serializers.ReadOnlyField(source="followers_count")
+    total_following = serializers.ReadOnlyField(source="following_count")
+    profileavatar = ProfileAvatarSerializer(required=False, many=False)
+
+    class Meta:
+        model = Profile
+        fields = [
+            "bio",
+            "total_followers",
+            "total_following",
+            "profileavatar",
+            "total_likes",
+        ]
+
+
 class UserDetailSerializer(serializers.ModelSerializer):
     profile = ProfileDetailSerializer(required=False, many=False)
 
@@ -61,6 +61,7 @@ class ProfileBioSerializer(serializers.ModelSerializer):
         fields = ["bio"]
 
 
+# TODO: - think and refactor
 class EditUserSerializer(serializers.ModelSerializer):
     bio = serializers.CharField(required=False)
     profile = ProfileBioSerializer(required=False)

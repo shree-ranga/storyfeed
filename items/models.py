@@ -1,10 +1,5 @@
 from django.db import models
 from django.conf import settings
-from django.core.validators import URLValidator
-from django.contrib.contenttypes.fields import GenericRelation
-
-
-from notifications.models import Notification
 
 
 class Item(models.Model):
@@ -12,11 +7,10 @@ class Item(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="item_by"
     )
     item = models.ImageField(null=True, blank=True)
-    expiry_time = models.IntegerField(default=1)
+    expiry_time = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    report_counter = models.IntegerField(default=0)
-    notifications = GenericRelation(Notification)
+    report_counter = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ("-created_at",)
@@ -38,7 +32,6 @@ class Like(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="liked_by"
     )
-    notifications = GenericRelation(Notification)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

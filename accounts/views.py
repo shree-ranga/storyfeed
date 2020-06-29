@@ -31,6 +31,34 @@ from notifications.serializers import NotificationSerializer
 User = get_user_model()
 
 
+class ProfileAvatarAPI(APIView):
+    def post(self, request, *args, **kwargs):
+        avatar = request.data.get("avatar")
+        data = {"avatar": avatar}
+        serializer = ProfileAvatarSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save(profile=request.user.profile)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, *args, **kwargs):
+        avatar = request.data.get("avatar")
+        profile = self.request.user.profile
+        avatar_instance = ProfileAvatar(profile=profile)
+        data = {"avatar": avatar}
+        serializer = ProfileAvatarSerializer(avatar_instance, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, *args, **kwargs):
+        profile_avatar = request.user.profile.profileavatar
+        profile_avatar.delete()
+        delete_profile_avatar.delay(request.user.id)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class UserListAPI(generics.ListAPIView):
     filter_backends = [SearchFilter]
     search_fields = ["username", "full_name"]
@@ -58,32 +86,6 @@ class UserDetailAPI(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ProfileAvatarAPI(APIView):
-    def post(self, request, *args, **kwargs):
-        avatar = request.data.get("avatar")
-        serializer = ProfileAvatarSerializer(data={"avatar": avatar})
-        if serializer.is_valid():
-            serializer.save(profile=request.user.profile)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request, *args, **kwargs):
-        profile = self.request.user.profile
-        avatar_instance = ProfileAvatar(profile=profile)
-        avatar = request.data.get("avatar")
-        serializer = ProfileAvatarSerializer(avatar_instance, data={"avatar": avatar})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, *args, **kwargs):
-        profile_avatar = request.user.profile.profileavatar
-        profile_avatar.delete()
-        delete_profile_avatar.delay(request.user.id)
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 class EditUserView(APIView):
     permission_classes = [IsOwnerOrAdmin]
 
@@ -97,7 +99,6 @@ class EditUserView(APIView):
 
 
 class UserFollowUnfollowAPI(APIView):
-    # follow
     def post(self, request, *args, **kwargs):
         following_user_id = request.data.get("following_user_id")
         follow_data = {
@@ -117,6 +118,7 @@ class UserFollowUnfollowAPI(APIView):
             notification_serializer = NotificationSerializer(data=notification_data)
             if notification_serializer.is_valid():
                 notification_serializer.save()
+
                 send_follow_push_notification.delay(
                     receiver_id=notification_serializer.instance.receiver_id,
                     sender_id=notification_serializer.instance.sender_id,
@@ -124,7 +126,6 @@ class UserFollowUnfollowAPI(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # unfollow
     def delete(self, request, *args, **kwargs):
         query_params = request.query_params
         follower_user_id = request.user.id
@@ -135,10 +136,10 @@ class UserFollowUnfollowAPI(APIView):
         if instance:
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(
-            {"error": "Following user instance does not exist"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        # return Response(
+        #     {"error": "Following user instance does not exist"},
+        #     status=status.HTTP_400_BAD_REQUEST,
+        # )
 
 
 class CheckFollowedAPI(APIView):
