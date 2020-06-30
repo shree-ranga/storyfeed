@@ -62,4 +62,4 @@ storyboard_nginx.conf
 # env
 .env
 
-settings/base.py
+storyboard/settings/base.py

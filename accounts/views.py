@@ -54,7 +54,6 @@ class ProfileAvatarAPI(APIView):
 
     def delete(self, request, *args, **kwargs):
         profile_avatar = request.user.profile.profileavatar
-        profile_avatar.delete()
         delete_profile_avatar.delay(request.user.id)
         return Response(status=status.HTTP_204_NO_CONTENT)
 

@@ -28,8 +28,8 @@ def process_avatar_image(user_id):
         default_storage.save(user.profile.profileavatar.avatar.name, memfile)
         memfile.close()
         i.close()
-    except:
-        raise "Unable to process"
+    except Exception as e:
+        print(e)
 
 
 @shared_task
@@ -65,7 +65,10 @@ def delete_profile_avatar(user_id):
         s3_resource = boto3.resource("s3")
         s3_resource.Object(
             settings.AWS_STORAGE_BUCKET_NAME,
-            f"{default_storage.location}/{user.profile.profilavatar.avatar.name}",
+            f"{default_storage.location}/{user.profile.profileavatar.avatar.name}",
         ).delete()
-    except:
-        pass
+        profile_avatar = user.profile.profileavatar
+        profile_avatar.delete()
+        user.save()
+    except Exception as e:
+        print(e)
