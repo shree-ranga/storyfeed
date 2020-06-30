@@ -144,7 +144,7 @@ CELERY_ALWAYS_EAGER = False
 
 # APNs settings
 PUSH_NOTIFICATIONS_SETTINGS = {
-    "APNS_CERTIFICATE": os.path.join(BASE_DIR + "/prod_cert.pem"),
+    "APNS_CERTIFICATE": os.path.join(BASE_DIR + "/apns_prod.pem"),
     "APNS_TOPIC": "com.storyboard.storyboard",
     "UPDATE_ON_DUPLICATE_REG_ID": True,
     "UNIQUE_REG_ID": True,
@@ -154,9 +154,11 @@ PUSH_NOTIFICATIONS_SETTINGS = {
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 
-# AWS S3
+# default file storage
 DEFAULT_FILE_STORAGE = "storyboard.storage_backends.MediaStorage"
-AWS_S3_REGION_NAME = "us-east-2"  # e.g. us-east-2
-AWS_STORAGE_BUCKET_NAME = "storyfeed-remote-s3-test"
+
+# AWS S3
+AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 AWS_DEFAULT_ACL = None
-AWS_S3_CUSTOM_DOMAIN = "d1jb0mkjj1vmul.cloudfront.net"
+AWS_S3_CUSTOM_DOMAIN = os.getenv("AWS_S3_CUSTOM_DOMAIN")
