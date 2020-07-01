@@ -1,6 +1,10 @@
 from django.db import models
 from django.conf import settings
 
+# from django.contrib.contenttypes.fields import GenericRelation
+
+# from notifications.models import Notification
+
 
 class Item(models.Model):
     user = models.ForeignKey(

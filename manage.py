@@ -5,7 +5,10 @@ import sys
 
 
 def main():
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "storyboard.settings.prod")
+    if os.getenv("DJANGO_ENV") == "DEV":
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "storyboard.settings.dev")
+    elif os.getenv("DJANGO_ENV") == "PROD":
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "storyboard.settings.prod")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

@@ -1,8 +1,14 @@
+from django.contrib.auth import get_user_model
+from django.db.models import F
+
 from rest_framework import serializers
+from rest_framework.validators import ValidationError
 
 from .models import Item, Like
 
 from accounts.serializers import UserListSerializer
+
+User = get_user_model()
 
 
 class ItemCreateSerializer(serializers.ModelSerializer):
@@ -10,7 +16,7 @@ class ItemCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ["id", "user", "item"]
+        fields = ["id", "user", "item", "expiry_time"]
         read_only_fields = ["id"]
 
 
@@ -50,7 +56,18 @@ class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
         fields = ["id", "item", "user"]
-        read_only_fields = ["id", "user"]
+        read_only_fields = ["id"]
+
+    def create(self, validated_data):
+        instance = Like.objects.create(**validated_data)
+
+        # update likes count for the user
+        user = User.objects.get(id=instance.item.user.id)
+        user.profile.total_likes = F("total_likes") + 1
+        user.profile.save()
+        user.save()
+
+        return instance
 
 
 class LikeNotificationSerializer(serializers.ModelSerializer):

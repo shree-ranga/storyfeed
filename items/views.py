@@ -1,5 +1,4 @@
 import datetime
-import calendar
 
 from django.db.models import F
 from django.contrib.auth import get_user_model
@@ -23,11 +22,9 @@ from .pagination import (
     FeedPagination,
 )
 from .permissions import IsOwnerOrAdmin
-from .tasks import send_item_like_notification, delete_item
+from .tasks import delete_item, send_item_like_notification
 
 from notifications.serializers import NotificationSerializer
-
-from storyboard.storage_backends import MediaStorage
 
 User = get_user_model()
 
@@ -35,23 +32,16 @@ User = get_user_model()
 class ItemCreateView(APIView):
     def post(self, request, *args, **kwargs):
         item = request.data.get("item")
-        expiration_time = request.data.pop("expiration_time")
-
-        serializer = ItemCreateSerializer(data={"item": item})
+        expiration_time = request.data.get("expiry_time")
+        data = {"item": item, "expiry_time": int(expiration_time)}
+        serializer = ItemCreateSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)
 
-            created_at = serializer.instance.created_at
-            if expiration_time[0] == "1D":
-                time_to_delete = created_at + datetime.timedelta(days=1)
-            elif expiration_time[0] == "1M":
-                time_to_delete = created_at + datetime.timedelta(days=7)
-            elif expiration_time[0] == "1Y":
-                if calendar.isleap(datetime.datetime.now().year):
-                    time_to_delete = created_at + datetime.timedelta(days=366)
-                else:
-                    time_to_delete = created_at + datetime.timedelta(days=365)
-            delete_item.apply_async(args=(serializer.instance.id,), eta=time_to_delete)
+            delete_eta = serializer.instance.created_at + datetime.timedelta(
+                days=serializer.instance.expiry_time
+            )
+            delete_item.apply_async(args=(serializer.instance.id,), eta=delete_eta)
 
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -113,18 +103,17 @@ class UserFeedView(generics.ListAPIView):
 class LikeUnlikeItemView(APIView):
     def post(self, request, *args, **kwargs):
         item_id = request.data.get("post_id")
-        data = {"item": item_id}
-
+        data = {"item": item_id, "user": request.user.id}
         serializer = LikeSerializer(data=data)
         if serializer.is_valid():
-            serializer.save(user=request.user)
-
-            user = User.objects.get(id=serializer.instance.item.user.id)
-            user.profile.total_likes += 1
-            user.profile.save()
-            user.save()
+            serializer.save()
 
             if serializer.instance.user != serializer.instance.item.user:
+                send_item_like_notification.delay(
+                    receiver_id=serializer.instance.item.user.id,
+                    sender_id=serializer.instance.user.id,
+                )
+
                 notification_data = {
                     "receiver": serializer.instance.item.user.id,
                     "sender": serializer.instance.user.id,
@@ -135,25 +124,20 @@ class LikeUnlikeItemView(APIView):
                 if notification_serializer.is_valid():
                     notification_serializer.save()
 
-                    send_item_like_notification.delay(
-                        receiver_id=notification_serializer.instance.receiver_id,
-                        sender_id=notification_serializer.instance.sender_id,
-                    )
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, *args, **kwargs):
         item_id = request.query_params.get("post_id")
         user_id = request.user.id
+        like_instance = Like.objects.get(item=item_id, user=user_id)
+        like_instance.delete()
 
         item = Item.objects.get(id=item_id)
         item_user = User.objects.get(id=item.user.id)
-        item_user.profile.total_likes -= 1
+        item_user.profile.total_likes = F("total_likes") - 1
         item_user.profile.save()
         item_user.save()
-
-        like_instance = Like.objects.get(item=item_id, user=user_id)
-        like_instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
