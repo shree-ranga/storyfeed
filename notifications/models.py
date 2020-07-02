@@ -27,4 +27,4 @@ class Notification(models.Model):
         ordering = ("-created_at",)
 
     def __str__(self):
-        return f"{self.sender} -> {self.notification_type} -> {self.receiver}"
+        return f"notification_id-{self.id} {self.sender} -> {self.notification_type} -> {self.receiver}"

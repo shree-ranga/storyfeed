@@ -23,8 +23,8 @@ User = get_user_model()
 def send_item_like_notification(receiver_id, sender_id):
     try:
         devices = APNSDevice.objects.filter(user=receiver_id)
-    except APNSDevice.ObjectDoesNotExist:
-        pass
+    except APNSDevice.ObjectDoesNotExist as e:
+        print(e)
 
     sender = User.objects.get(id=sender_id)
 
@@ -74,5 +74,5 @@ def delete_item(item_id):
             f"{default_storage.location}/{i.item.name}",
         ).delete()
         i.delete()
-    except:
-        pass
+    except Exception as e:
+        print(e)

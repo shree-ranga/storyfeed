@@ -108,21 +108,12 @@ class LikeUnlikeItemView(APIView):
         if serializer.is_valid():
             serializer.save()
 
+            # send push notification
             if serializer.instance.user != serializer.instance.item.user:
                 send_item_like_notification.delay(
                     receiver_id=serializer.instance.item.user.id,
                     sender_id=serializer.instance.user.id,
                 )
-
-                notification_data = {
-                    "receiver": serializer.instance.item.user.id,
-                    "sender": serializer.instance.user.id,
-                    "content_object": serializer.instance,
-                    "notification_type": "like",
-                }
-                notification_serializer = NotificationSerializer(data=notification_data)
-                if notification_serializer.is_valid():
-                    notification_serializer.save()
 
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

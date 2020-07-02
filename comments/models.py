@@ -3,6 +3,10 @@ from django.conf import settings
 
 from items.models import Item
 
+from django.contrib.contenttypes.fields import GenericRelation
+
+from notifications.models import Notification
+
 
 class Comment(models.Model):
     comment = models.CharField(max_length=2200, null=True, blank=True)
@@ -14,6 +18,7 @@ class Comment(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    notifications = GenericRelation(Notification)
 
     class Meta:
         ordering = ("-created_at",)

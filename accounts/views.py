@@ -26,8 +26,6 @@ from .pagination import UserSearchPagination, UserFollowerFollowingPagination
 from .permissions import IsOwnerOrAdmin
 from .tasks import send_follow_push_notification, delete_profile_avatar
 
-from notifications.serializers import NotificationSerializer
-
 User = get_user_model()
 
 
@@ -108,20 +106,11 @@ class UserFollowUnfollowAPI(APIView):
         if serializer.is_valid():
             serializer.save()
 
-            notification_data = {
-                "receiver": serializer.instance.following_user_id,
-                "sender": serializer.instance.follower_user_id,
-                "content_object": serializer.instance,
-                "notification_type": "follow",
-            }
-            notification_serializer = NotificationSerializer(data=notification_data)
-            if notification_serializer.is_valid():
-                notification_serializer.save()
+            send_follow_push_notification.delay(
+                receiver_id=serializer.instance.following_user_id,
+                sender_id=serializer.instance.follower_user_id,
+            )
 
-                send_follow_push_notification.delay(
-                    receiver_id=notification_serializer.instance.receiver_id,
-                    sender_id=notification_serializer.instance.sender_id,
-                )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -135,10 +124,6 @@ class UserFollowUnfollowAPI(APIView):
         if instance:
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        # return Response(
-        #     {"error": "Following user instance does not exist"},
-        #     status=status.HTTP_400_BAD_REQUEST,
-        # )
 
 
 class CheckFollowedAPI(APIView):

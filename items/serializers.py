@@ -7,6 +7,7 @@ from rest_framework.validators import ValidationError
 from .models import Item, Like
 
 from accounts.serializers import UserListSerializer
+from notifications.models import Notification
 
 User = get_user_model()
 
@@ -61,11 +62,22 @@ class LikeSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         instance = Like.objects.create(**validated_data)
 
-        # update likes count for the user
+        # update likes count of the user
         user = User.objects.get(id=instance.item.user.id)
         user.profile.total_likes = F("total_likes") + 1
         user.profile.save()
         user.save()
+
+        # create notification object
+        if instance.user != instance.item.user:
+            n_data = {
+                "receiver": instance.item.user,
+                "sender": instance.user,
+                "content_object": instance,
+                "notification_type": "like",
+            }
+            n = Notification(**n_data)
+            n.save()
 
         return instance
 

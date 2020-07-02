@@ -1,9 +1,9 @@
 from django.db import models
 from django.conf import settings
 
-# from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.fields import GenericRelation
 
-# from notifications.models import Notification
+from notifications.models import Notification
 
 
 class Item(models.Model):
@@ -37,6 +37,7 @@ class Like(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="liked_by"
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    notifications = GenericRelation(Notification)
 
     class Meta:
         unique_together = ("item", "user")

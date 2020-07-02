@@ -4,6 +4,8 @@ from rest_framework import serializers
 
 from .models import Profile, Follow, ProfileAvatar
 
+from notifications.models import Notification
+
 User = get_user_model()
 
 
@@ -103,6 +105,21 @@ class FollowSerializer(serializers.ModelSerializer):
         model = Follow
         fields = ["id", "following_user", "follower_user"]
         read_only_fields = ["id"]
+
+    def create(self, validated_data):
+        instance = Follow.objects.create(**validated_data)
+
+        # create notification
+        n_data = {
+            "receiver": instance.following_user.user,
+            "sender": instance.follower_user.user,
+            "content_object": instance,
+            "notification_type": "follow",
+        }
+        n = Notification(**n_data)
+        n.save()
+
+        return instance
 
 
 class FollowNotificationSerialzier(serializers.ModelSerializer):

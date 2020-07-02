@@ -18,6 +18,16 @@ from comments.serializers import CommentNotificationSerializer
 
 
 class NotifiedObjectRelatedField(serializers.RelatedField):
+    def to_internal_value(self, value):
+        if isinstance(value, Follow):
+            return value
+        elif isinstance(value, Like):
+            return value
+        elif isinstance(value, Comment):
+            return value
+        else:
+            raise Exception("Unexpected content object")
+
     def to_representation(self, value):
         if isinstance(value, Follow):
             serializer = FollowNotificationSerialzier(value)
@@ -29,16 +39,6 @@ class NotifiedObjectRelatedField(serializers.RelatedField):
             raise Exception("Unexpected content object")
         return serializer.data
 
-    def to_internal_value(self, value):
-        if isinstance(value, Follow):
-            return value
-        elif isinstance(value, Like):
-            return value
-        elif isinstance(value, Comment):
-            return value
-        else:
-            raise Exception("Unexpected content object")
-
 
 class NotificationListSerializer(serializers.ModelSerializer):
     content_object = NotifiedObjectRelatedField(read_only=True)
@@ -48,6 +48,9 @@ class NotificationListSerializer(serializers.ModelSerializer):
         model = Notification
         fields = ["id", "sender", "content_object", "notification_type", "created_at"]
         read_only_fields = ["id", "sender"]
+
+    def to_representation(self, instance):
+        return super().to_representation(instance)
 
 
 class NotificationSerializer(serializers.ModelSerializer):

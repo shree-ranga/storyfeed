@@ -2,6 +2,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 
+from django.contrib.contenttypes.fields import GenericRelation
+
+from notifications.models import Notification
+
 
 class User(AbstractUser):
     full_name = models.CharField(max_length=100, null=True, blank=True)
@@ -46,6 +50,7 @@ class Follow(models.Model):
         Profile, related_name="following_user", on_delete=models.CASCADE
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    notifications = GenericRelation(Notification)
 
     class Meta:
         unique_together = ("following_user", "follower_user")
