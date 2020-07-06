@@ -154,7 +154,7 @@ class ReportItemView(APIView):
     def post(self, request, *args, **kwargs):
         item_id = request.data.get("post_id")
         item = Item.objects.get(id=item_id)
-        item.report_counter += 1
+        item.report_counter = F("report_counter") + 1
         item.save()
         return Response(status=status.HTTP_201_CREATED)
 

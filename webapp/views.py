@@ -33,3 +33,12 @@ class PrivacyView(APIView):
 
     def get(self, request):
         return Response({})
+
+
+class CommunityGuidelinesView(APIView):
+    permission_classes = [AllowAny]
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = "webapp/guidelines.html"
+
+    def get(self, request):
+        return Response({})

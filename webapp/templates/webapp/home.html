@@ -28,41 +28,45 @@
         margin-right: 10px;
     }
 
+    .support {
+        margin-right: 2vw;
+    }
+
+    .guidelines {
+        text-decoration: none;
+        color: black;
+    }
+
     .terms {
         text-decoration: none;
-        /* margin-left: 50vw; */
+        margin-right: 2vw;
         color: black;
 
     }
 
     .privacy {
         text-decoration: none;
-        margin-left: 2vw;
+        margin-right: 2vw;
         color: black;
     }
 
     .rights {
         margin-left: 2vw;
-        /* padding-right: 6vw; */
-        /* margin-right: 4vw; */
-
     }
 </style>
 
 
 <header id="container">
     <h1 id="heading"><b>Storyfeed</b></h1>
-    <p>An app exclusively for stories. Share your moments in a fun and more meaningful way.</p>
+    <p>Stories reimagined!</p>
 </header>
 
 <footer id="foot">
-    <a href="{% url 'terms-storyfeed' %}" class="terms">TERMS</a>
-    <a href="{% url 'privacy-storyfeed' %}" class="privacy">PRIVACY</a>
+    <span class="support">support@storyfeed.xyz</span>
+    <a href="{% url 'terms' %}" class="terms">TERMS</a>
+    <a href="{% url 'privacy' %}" class="privacy">PRIVACY</a>
+    <a href="{% url 'community_guidelines' %}" class="guidelines">COMMUNITY GUIDELINES</a>
     <span class="rights">© 2020 Storyfeed Inc. All Rights Reserved.</span>
 
 </footer>
-
-
-
-
 {% endblock %}
