@@ -8,7 +8,7 @@ from celery import shared_task
 
 from push_notifications.models import APNSDevice
 
-from PIL import Image
+from PIL import Image, ExifTags
 
 import boto3
 
@@ -21,9 +21,23 @@ User = get_user_model()
 def process_avatar_image(user_id):
     try:
         memfile = BytesIO()
+
         user = User.objects.get(id=user_id)
+
         i = Image.open(user.profile.profileavatar.avatar)
-        i.thumbnail(size=(300, 450))
+
+        exif = dict(
+            (ExifTags.TAGS[k], v) for k, v in i._getexif().items() if k in ExifTags.TAGS
+        )
+
+        if exif["Orientation"] == 6:
+            i = i.transpose(Image.ROTATE_270)
+        elif exif["Orientation"] == 3:
+            i = i.transpose(Image.ROTATE_180)
+        elif exif["Orientation"] == 8:
+            i = i.transpose(Image.ROTATE_90)
+
+        i.thumbnail(size=(300, 300))
         i.save(memfile, "JPEG")
         default_storage.save(user.profile.profileavatar.avatar.name, memfile)
         memfile.close()

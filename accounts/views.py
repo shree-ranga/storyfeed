@@ -24,7 +24,10 @@ from .serializers import (
 from .models import Follow, ProfileAvatar
 from .pagination import UserSearchPagination, UserFollowerFollowingPagination
 from .permissions import IsOwnerOrAdmin
-from .tasks import send_follow_push_notification, delete_profile_avatar
+from .tasks import (
+    send_follow_push_notification,
+    process_avatar_image,
+)
 
 User = get_user_model()
 
