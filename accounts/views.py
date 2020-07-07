@@ -27,6 +27,7 @@ from .permissions import IsOwnerOrAdmin
 from .tasks import (
     send_follow_push_notification,
     process_avatar_image,
+    delete_profile_avatar,
 )
 
 User = get_user_model()
