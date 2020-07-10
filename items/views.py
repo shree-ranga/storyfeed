@@ -77,7 +77,7 @@ class ExploreItemsView(generics.ListAPIView):
         following_ids = list(user.profile.following.all().values_list(flat=True))
         following_ids.append(user.id)
         queryset = Item.objects.exclude(
-            Q(user__in=following_ids) & Q(user__in=block_list_ids)
+            Q(user__in=following_ids) | Q(user__in=block_list_ids)
         )
         return queryset
 
