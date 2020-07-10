@@ -16,6 +16,7 @@ class Comment(models.Model):
     item = models.ForeignKey(
         Item, on_delete=models.CASCADE, related_name="item_comments"
     )
+    report_count = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     notifications = GenericRelation(Notification)

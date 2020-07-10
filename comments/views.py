@@ -1,8 +1,9 @@
+from django.db.models import F
+
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.exceptions import ValidationError
 
 from .models import Comment
 from .serializers import CommentCreateSerializer, CommentListSerializer
@@ -62,4 +63,9 @@ class CommentDeleteView(APIView):
 
 
 class CommentReportView(APIView):
-    pass
+    def post(self, request, *args, **kwargs):
+        comment_id = request.data.get("comment_id")
+        comment = Comment.objects.get(id=comment_id)
+        comment.report_count = F("report_count") + 1
+        comment.save()
+        return Response(status=status.HTTP_201_CREATED)

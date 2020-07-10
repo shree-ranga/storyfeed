@@ -8,6 +8,7 @@ from .views import (
     LikeUnlikeItemView,
     CheckItemLikeView,
     ItemDeleteView,
+    ReportItemView,
 )
 
 urlpatterns = [
@@ -18,4 +19,5 @@ urlpatterns = [
     path("like-unlike/", LikeUnlikeItemView.as_view(), name="post_like_unlike"),
     path("check-like/", CheckItemLikeView.as_view(), name="check_post_like"),
     path("delete/", ItemDeleteView.as_view(), name="delete"),
+    path("report/", ReportItemView.as_view(), name="report"),
 ]

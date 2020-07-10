@@ -197,7 +197,11 @@ class UserFollowingListAPI(generics.ListAPIView):
 
 class ReportUserAPI(APIView):
     def post(self, request, *args, **kwargs):
-        pass
+        reporting_id = request.data.get("reporting_id")
+        user = User.objects.get(id=reporting_id)
+        user.profile.report_count = F("report_count") + 1
+        user.profile.save()
+        return Response(status=status.HTTP_201_CREATED)
 
 
 class BlockUnblockUserAPI(APIView):
