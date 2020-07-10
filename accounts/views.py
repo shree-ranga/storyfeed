@@ -1,5 +1,3 @@
-import os
-
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.core.files.storage import default_storage
@@ -11,8 +9,6 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.filters import SearchFilter
 from rest_framework import generics
-
-from PIL import Image
 
 from .serializers import (
     UserListSerializer,
@@ -64,6 +60,7 @@ class UserListAPI(generics.ListAPIView):
     filter_backends = [SearchFilter]
     search_fields = ["username", "full_name"]
     pagination_class = UserSearchPagination
+
     # TODO: - refactor blocking logic
     def get_queryset(self):
         blocked_by_ids = list(self.request.user.blocked_by.all().values_list(flat=True))

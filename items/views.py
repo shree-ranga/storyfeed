@@ -1,6 +1,6 @@
 import datetime
 
-from django.db.models import F
+from django.db.models import F, Q
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
@@ -69,9 +69,16 @@ class ExploreItemsView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
+        blocked_by_ids = list(user.blocked_by.all().values_list(flat=True))
+        blocked_profile_ids = list(
+            user.profile.blocked_profiles.all().values_list(flat=True)
+        )
+        block_list_ids = blocked_by_ids + blocked_profile_ids
         following_ids = list(user.profile.following.all().values_list(flat=True))
         following_ids.append(user.id)
-        queryset = Item.objects.exclude(user__in=following_ids)
+        queryset = Item.objects.exclude(
+            Q(user__in=following_ids) & Q(user__in=block_list_ids)
+        )
         return queryset
 
     def get_serializer(self, *args, **kwargs):
