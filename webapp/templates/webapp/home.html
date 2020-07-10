@@ -29,6 +29,8 @@
     }
 
     .support {
+        text-decoration: none;
+        color: black;
         margin-right: 2vw;
     }
 
@@ -62,10 +64,11 @@
 </header>
 
 <footer id="foot">
-    <span class="support">support@storyfeed.xyz</span>
-    <a href="{% url 'terms' %}" class="terms">TERMS</a>
-    <a href="{% url 'privacy' %}" class="privacy">PRIVACY</a>
-    <a href="{% url 'community_guidelines' %}" class="guidelines">COMMUNITY GUIDELINES</a>
+    <!-- <span class="support">support@storyfeed.xyz</span> -->
+    <a href="mailto:support@storyfeed.xyz" class="support">Contact Us</a>
+    <a href="{% url 'terms' %}" class="terms">Terms of Service</a>
+    <a href="{% url 'privacy' %}" class="privacy">Privacy Policy</a>
+    <a href="{% url 'community_guidelines' %}" class="guidelines">Community Guidelines</a>
     <span class="rights">© 2020 Storyfeed Inc. All Rights Reserved.</span>
 
 </footer>
