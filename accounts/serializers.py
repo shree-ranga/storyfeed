@@ -127,3 +127,9 @@ class FollowNotificationSerialzier(serializers.ModelSerializer):
         model = Follow
         fields = ["id", "following_user"]
         read_only_fields = ["id", "following_user"]
+
+
+# class BlockUserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Profile
+#         fields = ["id", "blocked_profiles"]

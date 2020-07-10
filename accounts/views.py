@@ -3,7 +3,7 @@ import os
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
+from django.db.models import F, Q
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -64,9 +64,15 @@ class UserListAPI(generics.ListAPIView):
     filter_backends = [SearchFilter]
     search_fields = ["username", "full_name"]
     pagination_class = UserSearchPagination
-
+    # TODO: - refactor blocking logic
     def get_queryset(self):
-        return User.objects.all()
+        blocked_by_ids = list(self.request.user.blocked_by.all().values_list(flat=True))
+        blocked_profile_ids = list(
+            self.request.user.profile.blocked_profiles.all().values_list(flat=True)
+        )
+        block_list_ids = blocked_by_ids + blocked_profile_ids
+        users = User.objects.exclude(pk__in=block_list_ids)
+        return users
 
     def get_serializer(self, *args, **kwargs):
         serializer_class = self.get_serializer_class()
@@ -190,3 +196,45 @@ class UserFollowingListAPI(generics.ListAPIView):
 
     def get_serializer_class(self):
         return UserListSerializer
+
+
+class ReportUserAPI(APIView):
+    def post(self, request, *args, **kwargs):
+        pass
+
+
+class BlockUnblockUserAPI(APIView):
+    def get(self, request, *args, **kwargs):
+        blocked_users = self.request.user.profile.blocked_profiles.all()
+        serializer = UserListSerializer(blocked_users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        blocking_id = request.data.get("blocking_id")
+        request.user.profile.blocked_profiles.add(blocking_id)
+        request.user.profile.save()
+        follower_user_id = request.user.id
+
+        try:
+            following_instance = Follow.objects.get(
+                follower_user_id=follower_user_id, following_user_id=blocking_id
+            )
+            following_instance.delete()
+        except Exception as e:
+            pass
+
+        try:
+            follower_instance = Follow.objects.get(
+                follower_user_id=blocking_id, following_user_id=follower_user_id
+            )
+            follower_instance.delete()
+        except Exception as e:
+            pass
+
+        return Response(status=status.HTTP_201_CREATED)
+
+    def delete(self, request, *args, **kwargs):
+        unblocking_id = request.query_params.get("unblocking_id")
+        request.user.profile.blocked_profiles.remove(unblocking_id)
+        request.user.profile.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)

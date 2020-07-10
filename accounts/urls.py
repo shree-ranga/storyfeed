@@ -9,6 +9,8 @@ from .views import (
     UserFollowersListAPI,
     UserFollowingListAPI,
     EditUserView,
+    ReportUserAPI,
+    BlockUnblockUserAPI,
 )
 
 urlpatterns = [
@@ -32,4 +34,6 @@ urlpatterns = [
         name="user_following",
     ),
     path("users/edit-user/", EditUserView.as_view(), name="edit_user"),
+    path("users/report/", ReportUserAPI.as_view(), name="report_user"),
+    path("users/block/", BlockUnblockUserAPI.as_view(), name="block_user"),
 ]
