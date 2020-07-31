@@ -92,7 +92,7 @@ class EditUserSerializer(serializers.ModelSerializer):
 
 
 class UserNotificationSerializer(serializers.ModelSerializer):
-    profile = ProfileAvatarSerializer()
+    profile = ProfilePicSerializer()
 
     class Meta:
         model = User
