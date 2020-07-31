@@ -42,12 +42,12 @@ class NotifiedObjectRelatedField(serializers.RelatedField):
 
 class NotificationListSerializer(serializers.ModelSerializer):
     content_object = NotifiedObjectRelatedField(read_only=True)
-    sender = UserNotificationSerializer(required=False)
+    sender = UserNotificationSerializer(required=False, read_only=True)
 
     class Meta:
         model = Notification
         fields = ["id", "sender", "content_object", "notification_type", "created_at"]
-        read_only_fields = ["id", "sender"]
+        read_only_fields = ["id"]
 
     def to_representation(self, instance):
         return super().to_representation(instance)
