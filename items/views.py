@@ -32,8 +32,9 @@ User = get_user_model()
 class ItemCreateView(APIView):
     def post(self, request, *args, **kwargs):
         item = request.data.get("item")
+        caption = request.data.get("caption")
         expiration_time = request.data.get("expiry_time")
-        data = {"item": item, "expiry_time": int(expiration_time)}
+        data = {"item": item, "caption": caption, "expiry_time": int(expiration_time)}
         serializer = ItemCreateSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)

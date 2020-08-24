@@ -17,7 +17,7 @@ class ItemCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ["id", "user", "item", "expiry_time"]
+        fields = ["id", "user", "item", "expiry_time", "caption", "video_url"]
         read_only_fields = ["id"]
 
 
@@ -42,6 +42,8 @@ class ItemDetailSerializer(serializers.ModelSerializer):
             "created_at",
             "likes_count",
             "comments_count",
+            "caption",
+            "video_url",
         ]
         read_only_fields = ["id", "user"]
 

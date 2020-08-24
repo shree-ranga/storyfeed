@@ -11,6 +11,8 @@ class Item(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="item_by"
     )
     item = models.ImageField(null=True, blank=True)
+    video_url = models.CharField(max_length=300, null=True, blank=True)
+    caption = models.CharField(max_length=100, null=True, blank=True)
     expiry_time = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
