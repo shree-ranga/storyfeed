@@ -9,6 +9,7 @@ from .views import (
     CheckItemLikeView,
     ItemDeleteView,
     ReportItemView,
+    AwsS3SignatureAPI,
 )
 
 urlpatterns = [
@@ -20,4 +21,5 @@ urlpatterns = [
     path("check-like/", CheckItemLikeView.as_view(), name="check_post_like"),
     path("delete/", ItemDeleteView.as_view(), name="delete"),
     path("report/", ReportItemView.as_view(), name="report"),
+    path("aws-s3-direct/", AwsS3SignatureAPI.as_view(), name="AWS_S3_direct"),
 ]

@@ -9,6 +9,8 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 
+import boto3
+
 from .models import Item, Like
 from .serializers import (
     ItemCreateSerializer,
@@ -32,9 +34,15 @@ User = get_user_model()
 class ItemCreateView(APIView):
     def post(self, request, *args, **kwargs):
         item = request.data.get("item")
-        caption = request.data.get("caption")
+        video_url = request.data.get("video_url")
         expiration_time = request.data.get("expiry_time")
-        data = {"item": item, "caption": caption, "expiry_time": int(expiration_time)}
+        caption = request.data.get("caption")
+        data = {
+            "item": item,
+            "video_url": video_url,
+            "expiry_time": int(expiration_time),
+            "caption": caption,
+        }
         serializer = ItemCreateSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)
@@ -169,4 +177,13 @@ class ReportItemView(APIView):
 
 # s3 signature to direct upload from Frontend
 class AwsS3SignatureAPI(APIView):
-    pass
+    permission_classes = [IsOwnerOrAdmin]
+
+    def get(self, request, *args, **kwargs):
+        file_name = request.query_params.get("fileName")
+        s3 = boto3.client("s3")
+        s3_params = {"Bucket": settings.AWS_STORAGE_BUCKET_NAME, "Key": file_name}
+        presigned_url = s3.generate_presigned_url(
+            "put_object", Params=s3_params, ExpiresIn=3600, HttpMethod="PUT"
+        )
+        return Response({"presigned_url": presigned_url}, status=status.HTTP_200_OK)

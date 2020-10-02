@@ -17,7 +17,14 @@ class ItemCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ["id", "user", "item", "expiry_time", "caption", "video_url"]
+        fields = [
+            "id",
+            "user",
+            "item",
+            "video_url",
+            "expiry_time",
+            "caption",
+        ]
         read_only_fields = ["id"]
 
 
