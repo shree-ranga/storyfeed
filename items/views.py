@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 import boto3
+from botocore.client import Config
 
 from .models import Item, Like
 from .serializers import (
@@ -181,7 +182,7 @@ class AwsS3SignatureAPI(APIView):
 
     def get(self, request, *args, **kwargs):
         file_name = request.query_params.get("fileName")
-        s3 = boto3.client("s3")
+        s3 = boto3.client("s3", config=Config(signature_version='s3v4'))
         s3_params = {
             "Bucket": settings.AWS_STORAGE_BUCKET_NAME,
             "Key": f"media/{file_name}",
