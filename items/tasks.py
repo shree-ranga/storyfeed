@@ -69,10 +69,29 @@ def delete_item(item_id):
     try:
         i = Item.objects.get(id=item_id)
         s3_resource = boto3.resource("s3")
+
+        # delete video thumbnail or photo
         s3_resource.Object(
             settings.AWS_STORAGE_BUCKET_NAME,
             f"{default_storage.location}/{i.item.name}",
         ).delete()
+
+        # delete video
+        if i.video_url is not None:
+            video_last_path_component = i.video_url.split("/")[-1]
+            s3_resource.Object(
+                settings.AWS_STORAGE_BUCKET_NAME,
+                f"{default_storage.location}/{video_last_path_component}",
+            ).delete()
+
+        # delete audio
+        if i.audio_url is not None:
+            audio_last_path_component = i.audio_url.split("/")[-1]
+            s3_resource.Object(
+                settings.AWS_STORAGE_BUCKET_NAME,
+                f"{default_storage.location}/{audio_last_path_component}",
+            ).delete()
+
         i.delete()
     except Exception as e:
         print(e)

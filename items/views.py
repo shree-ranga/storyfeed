@@ -3,6 +3,7 @@ import datetime
 from django.db.models import F, Q
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.core.files.storage import default_storage
 
 from rest_framework.views import APIView
 from rest_framework import generics
@@ -36,11 +37,13 @@ class ItemCreateView(APIView):
     def post(self, request, *args, **kwargs):
         item = request.data.get("item")
         video_url = request.data.get("video_url")
+        audio_url = request.data.get("audio_url")
         expiration_time = request.data.get("expiry_time")
         caption = request.data.get("caption")
         data = {
             "item": item,
             "video_url": video_url,
+            "audio_url": audio_url,
             "expiry_time": int(expiration_time),
             "caption": caption,
         }
@@ -184,9 +187,9 @@ class AwsS3SignatureAPI(APIView):
         file_name = request.query_params.get("fileName")
         s3 = boto3.client("s3", "us-east-2", config=Config(signature_version="s3v4"))
         s3_params = {
-            # "Bucket": settings.AWS_STORAGE_BUCKET_NAME,
-            "Bucket": "storyfeed-production-bucket",
-            "Key": f"media/{file_name}",
+            "Bucket": settings.AWS_STORAGE_BUCKET_NAME,
+            # "Bucket": "storyfeed-production-bucket",
+            "Key": f"{default_storage.location}/{file_name}",
         }
         presigned_url = s3.generate_presigned_url(
             "put_object", Params=s3_params, ExpiresIn=3600, HttpMethod="PUT"
