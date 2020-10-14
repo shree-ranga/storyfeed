@@ -22,6 +22,7 @@ class ItemCreateSerializer(serializers.ModelSerializer):
             "user",
             "item",
             "video_url",
+            "audio_url",
             "expiry_time",
             "caption",
         ]
@@ -46,11 +47,12 @@ class ItemDetailSerializer(serializers.ModelSerializer):
             "id",
             "user",
             "item",
-            "created_at",
+            "video_url",
+            "audio_url",
+            "caption",
             "likes_count",
             "comments_count",
-            "caption",
-            "video_url",
+            "created_at",
         ]
         read_only_fields = ["id", "user"]
 

@@ -11,6 +11,7 @@ class Item(models.Model):
     )
     item = models.ImageField(null=True, blank=True)
     video_url = models.CharField(max_length=300, null=True, blank=True)
+    audio_url = models.CharField(max_length=300, null=True, blank=True)
     caption = models.CharField(max_length=100, null=True, blank=True)
     expiry_time = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
