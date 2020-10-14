@@ -184,9 +184,9 @@ class AwsS3SignatureAPI(APIView):
         s3 = boto3.client("s3")
         s3_params = {
             "Bucket": settings.AWS_STORAGE_BUCKET_NAME,
-            "Key": file_name,
+            "Key": f"media/{file_name}",
         }
         presigned_url = s3.generate_presigned_url(
-            "put_object", Params=s3_params, ExpiresIn=3600, HttpMethod="PUT"
+            "put_object", Params=s3_params, ExpiresIn=3600 * 5, HttpMethod="PUT"
         )
         return Response({"presigned_url": presigned_url}, status=status.HTTP_200_OK)
