@@ -26,7 +26,7 @@ from .pagination import (
     FeedPagination,
 )
 from .permissions import IsOwnerOrAdmin
-from .tasks import delete_item, send_item_like_notification
+from .tasks import delete_item, send_item_like_notification, create_hashtags
 
 from notifications.serializers import NotificationSerializer
 
@@ -47,8 +47,8 @@ class ItemCreateView(APIView):
             "audio_url": audio_url,
             "expiry_time": int(expiration_time),
             "caption": caption,
-            "hashTags": hashTags,
         }
+
         serializer = ItemCreateSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)
@@ -57,6 +57,12 @@ class ItemCreateView(APIView):
                 days=serializer.instance.expiry_time
             )
             delete_item.apply_async(args=(serializer.instance.id,), eta=delete_eta)
+
+            if hashTags:
+                create_hashtags.delay(
+                    serializer.instance.id,
+                    hashTags,
+                )
 
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

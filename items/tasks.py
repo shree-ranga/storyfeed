@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
@@ -9,7 +11,7 @@ import boto3
 
 # import redis
 
-from items.models import Item
+from items.models import Item, HashTag
 
 from notifications.models import Notification
 
@@ -61,6 +63,21 @@ def send_item_like_notification(receiver_id, sender_id):
 #         i.delete()
 #     except Item.ObjectDoesNotExist:
 #         pass
+
+
+@shared_task
+def create_hashtags(item_id, hashtags):
+    try:
+        i = Item.objects.get(id=item_id)
+        h = json.loads(hashtags)
+        words = h["hashTags"]
+        for word in words:
+            tag_instance, created = HashTag.objects.get_or_create(hashtag=word)
+            tag_instance.items.add(i)
+            tag_instance.save()
+
+    except Exception as e:
+        print(e)
 
 
 # TODO: - move this inside model

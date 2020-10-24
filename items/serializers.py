@@ -16,7 +16,6 @@ User = get_user_model()
 
 class ItemCreateSerializer(serializers.ModelSerializer):
     user = UserListSerializer(required=False)
-    hashTags = serializers.CharField()
 
     class Meta:
         model = Item
@@ -30,22 +29,8 @@ class ItemCreateSerializer(serializers.ModelSerializer):
             "caption",
             "engagement_counter",
             "is_private",
-            "hashTags",
         ]
         read_only_fields = ["id"]
-
-    def create(self, validated_data):
-        h = json.loads(validated_data.pop("hashTags"))
-        instance = Item.objects.create(**validated_data)
-
-        if h is not None:
-            words = h["hashTags"]
-            for word in words:
-                tag_instance, created = HashTag.objects.get_or_create(hashtag=word)
-                tag_instance.items.add(instance)
-                tag_instance.save()
-
-        return instance
 
 
 class ItemListSerializer(serializers.ModelSerializer):
