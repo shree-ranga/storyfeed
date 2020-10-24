@@ -40,12 +40,14 @@ class ItemCreateView(APIView):
         audio_url = request.data.get("audio_url")
         expiration_time = request.data.get("expiry_time")
         caption = request.data.get("caption")
+        hashTags = request.data.get("hashTags")
         data = {
             "item": item,
             "video_url": video_url,
             "audio_url": audio_url,
             "expiry_time": int(expiration_time),
             "caption": caption,
+            "hashTags": hashTags,
         }
         serializer = ItemCreateSerializer(data=data)
         if serializer.is_valid():
@@ -60,7 +62,25 @@ class ItemCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserItemListDetailView(generics.ListAPIView):
+class FeedItemsListView(generics.ListAPIView):
+    pagination_class = FeedPagination
+
+    def get_queryset(self):
+        user = self.request.user
+        following_ids = list(user.profile.following.all().values_list(flat=True))
+        following_ids.append(user.id)
+        queryset = Item.objects.filter(user__in=following_ids)
+        return queryset
+
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        return serializer_class(*args, **kwargs)
+
+    def get_serializer_class(self):
+        return ItemDetailSerializer
+
+
+class ProfileItemListView(generics.ListAPIView):
     pagination_class = UserItemListPagination
 
     def get_queryset(self):
@@ -77,7 +97,7 @@ class UserItemListDetailView(generics.ListAPIView):
         return ItemDetailSerializer
 
 
-class ExploreItemsView(generics.ListAPIView):
+class ExploreItemsListView(generics.ListAPIView):
     pagination_class = ExploreItemListPagination
 
     def get_queryset(self):
@@ -92,24 +112,6 @@ class ExploreItemsView(generics.ListAPIView):
         queryset = Item.objects.exclude(
             Q(user__in=following_ids) | Q(user__in=block_list_ids)
         )
-        return queryset
-
-    def get_serializer(self, *args, **kwargs):
-        serializer_class = self.get_serializer_class()
-        return serializer_class(*args, **kwargs)
-
-    def get_serializer_class(self):
-        return ItemDetailSerializer
-
-
-class UserFeedView(generics.ListAPIView):
-    pagination_class = FeedPagination
-
-    def get_queryset(self):
-        user = self.request.user
-        following_ids = list(user.profile.following.all().values_list(flat=True))
-        following_ids.append(user.id)
-        queryset = Item.objects.filter(user__in=following_ids)
         return queryset
 
     def get_serializer(self, *args, **kwargs):

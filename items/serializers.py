@@ -1,10 +1,12 @@
+import json
+
 from django.contrib.auth import get_user_model
 from django.db.models import F
 
 from rest_framework import serializers
 from rest_framework.validators import ValidationError
 
-from .models import Item, Like
+from .models import Item, Like, HashTag
 
 from accounts.serializers import UserListSerializer
 from notifications.models import Notification
@@ -14,6 +16,7 @@ User = get_user_model()
 
 class ItemCreateSerializer(serializers.ModelSerializer):
     user = UserListSerializer(required=False)
+    hashTags = serializers.CharField()
 
     class Meta:
         model = Item
@@ -25,15 +28,31 @@ class ItemCreateSerializer(serializers.ModelSerializer):
             "audio_url",
             "expiry_time",
             "caption",
+            "engagement_counter",
+            "is_private",
+            "hashTags",
         ]
         read_only_fields = ["id"]
+
+    def create(self, validated_data):
+        h = json.loads(validated_data.pop("hashTags"))
+        instance = Item.objects.create(**validated_data)
+
+        if h is not None:
+            words = h["hashTags"]
+            for word in words:
+                tag_instance, created = HashTag.objects.get_or_create(hashtag=word)
+                tag_instance.items.add(instance)
+                tag_instance.save()
+
+        return instance
 
 
 class ItemListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
-        fields = ["id", "item"]
-        read_only_fields = ["id"]
+        fields = ["id", "item", "engagement_counter"]
+        read_only_fields = ["id", "engagement_counter"]
 
 
 class ItemDetailSerializer(serializers.ModelSerializer):
@@ -100,3 +119,10 @@ class LikeNotificationSerializer(serializers.ModelSerializer):
         model = Like
         fields = ["id", "item"]
         read_only_fields = ["id", "item"]
+
+
+class HashTagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HashTag
+        fields = "__all__"
+        read_only_fields = ["id"]

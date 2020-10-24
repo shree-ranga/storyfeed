@@ -13,9 +13,11 @@ class Item(models.Model):
     video_url = models.CharField(max_length=300, null=True, blank=True)
     audio_url = models.CharField(max_length=300, null=True, blank=True)
     caption = models.CharField(max_length=100, null=True, blank=True)
+    is_private = models.BooleanField(default=False)
     expiry_time = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    engagement_counter = models.PositiveIntegerField(default=0)
     report_counter = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -46,3 +48,12 @@ class Like(models.Model):
 
     def __str__(self):
         return f"{self.user.username} liked {self.item.id}"
+
+
+class HashTag(models.Model):
+    items = models.ManyToManyField("Item", related_name="hashtags")
+    hashtag = models.CharField(max_length=100, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.hashtag}"

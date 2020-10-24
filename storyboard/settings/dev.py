@@ -36,9 +36,8 @@ INSTALLED_APPS = [
     "items",
     "comments",
     "webapp",
-    "chat",
+    # "chat",
     "metrics",
-    "hashtags",
 ]
 
 MIDDLEWARE = [

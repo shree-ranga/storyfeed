@@ -14,6 +14,7 @@ urlpatterns = [
     path(api_v1 + "items/", include("items.urls")),
     path(api_v1 + "comments/", include("comments.urls")),
     path(api_v1 + "notifications/", include("notifications.urls")),
+    # path(api_v1 + "chats/", include("chat.urls")),
     # web urls
     path("", include("webapp.urls")),
 ]
