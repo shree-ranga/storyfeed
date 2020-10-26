@@ -35,6 +35,7 @@ class UserListSerializer(serializers.ModelSerializer):
 class ProfileDetailSerializer(serializers.ModelSerializer):
     total_followers = serializers.ReadOnlyField(source="followers_count")
     total_following = serializers.ReadOnlyField(source="following_count")
+    total_items = serializers.ReadOnlyField(source="items_count")
     profileavatar = ProfileAvatarSerializer(required=False, many=False)
 
     class Meta:
@@ -43,8 +44,8 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
             "bio",
             "total_followers",
             "total_following",
+            "total_items",
             "profileavatar",
-            "total_likes",
         ]
 
 

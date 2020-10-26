@@ -13,7 +13,7 @@ from rest_framework import status
 import boto3
 from botocore.client import Config
 
-from .models import Item, Like
+from .models import Item, Like, HashTag
 from .serializers import (
     ItemCreateSerializer,
     ItemListSerializer,
@@ -23,6 +23,7 @@ from .serializers import (
 from .pagination import (
     UserItemListPagination,
     ExploreItemListPagination,
+    HashTagItemListPagination,
     FeedPagination,
 )
 from .permissions import IsOwnerOrAdmin
@@ -117,6 +118,32 @@ class ExploreItemsListView(generics.ListAPIView):
         following_ids.append(user.id)
         queryset = Item.objects.exclude(
             Q(user__in=following_ids) | Q(user__in=block_list_ids)
+        )
+        return queryset
+
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        return serializer_class(*args, **kwargs)
+
+    def get_serializer_class(self):
+        return ItemDetailSerializer
+
+
+class HashTagItemListView(generics.ListAPIView):
+    pagination_class = HashTagItemListPagination
+
+    def get_queryset(self):
+        user = self.request.user
+        blocked_by_ids = list(user.blocked_by.all().values_list(flat=True))
+        blocked_profile_ids = list(
+            user.profile.blocked_profiles.all().values_list(flat=True)
+        )
+        block_list_ids = blocked_by_ids + blocked_profile_ids
+
+        search_term = self.request.query_params.get("searchTerm")
+        h_instance = HashTag.objects.get(hashtag=search_term)
+        queryset = Item.objects.filter(Q(hashtags=h_instance)).exclude(
+            Q(user__in=block_list_ids)
         )
         return queryset
 

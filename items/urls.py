@@ -5,6 +5,7 @@ from .views import (
     ProfileItemListView,
     ExploreItemsListView,
     FeedItemsListView,
+    HashTagItemListView,
     LikeUnlikeItemView,
     CheckItemLikeView,
     ItemDeleteView,
@@ -16,7 +17,7 @@ urlpatterns = [
     path("upload/", ItemCreateView.as_view(), name="upload_post"),
     path("user/", ProfileItemListView.as_view(), name="user_posts"),
     path("explore-items/", ExploreItemsListView.as_view(), name="explorable_items"),
-    # path("hashtag-items")
+    path("hashtag-items/", HashTagItemListView.as_view(), name="hashtag-items"),
     path("feed/", FeedItemsListView.as_view(), name="user_feed"),
     path("like-unlike/", LikeUnlikeItemView.as_view(), name="post_like_unlike"),
     path("check-like/", CheckItemLikeView.as_view(), name="check_post_like"),

@@ -1,4 +1,4 @@
-from django.db.models import F
+from django.db.models import F, Q
 
 from rest_framework.views import APIView
 from rest_framework import generics
@@ -40,8 +40,17 @@ class CommentListView(generics.ListAPIView):
     pagination_class = CommentPagination
 
     def get_queryset(self):
+        user = self.request.user
+        blocked_by_ids = list(user.blocked_by.all().values_list(flat=True))
+        blocked_profile_ids = list(
+            user.profile.blocked_profiles.all().values_list(flat=True)
+        )
+        block_list_ids = blocked_by_ids + blocked_profile_ids
+
         item_id = self.request.query_params.get("post_id")
-        comments = Comment.objects.filter(item__id=item_id)
+        comments = Comment.objects.filter(item__id=item_id).exclude(
+            Q(user__in=block_list_ids)
+        )
         return comments
 
     def get_serializer(self, *args, **kwargs):

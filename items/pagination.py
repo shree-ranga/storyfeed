@@ -21,6 +21,15 @@ class ExploreItemListPagination(LimitOffsetPagination):
         )
 
 
+class HashTagItemListPagination(LimitOffsetPagination):
+    default_limit = 30
+
+    def get_paginated_response(self, data):
+        return Response(
+            {"count": self.count, "results": data}, status=status.HTTP_200_OK
+        )
+
+
 class UserItemListPagination(LimitOffsetPagination):
     default_limit = 30
 

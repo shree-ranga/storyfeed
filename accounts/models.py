@@ -38,6 +38,10 @@ class Profile(models.Model):
     def following_count(self):
         return self.following.count()
 
+    @property
+    def items_count(self):
+        return self.user.items.count()
+
     def __str__(self):
         return f"{self.user.username}'s profile"
 

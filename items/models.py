@@ -7,7 +7,7 @@ from notifications.models import Notification
 
 class Item(models.Model):
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="item_by"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="items"
     )
     item = models.ImageField(null=True, blank=True)
     video_url = models.CharField(max_length=300, null=True, blank=True)
