@@ -37,3 +37,11 @@ class UserItemListPagination(LimitOffsetPagination):
         return Response(
             {"count": self.count, "results": data}, status=status.HTTP_200_OK
         )
+
+class PostLikedUserPagination(LimitOffsetPagination):
+    default_limit = 30
+
+    def get_paginated_response(self, data):
+        return Response(
+            {"count": self.count, "results": data}, status=status.HTTP_200_OK
+        )

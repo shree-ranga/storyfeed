@@ -19,12 +19,14 @@ from .serializers import (
     ItemListSerializer,
     ItemDetailSerializer,
     LikeSerializer,
+    ItemLikedUserSerializer,
 )
 from .pagination import (
     UserItemListPagination,
     ExploreItemListPagination,
     HashTagItemListPagination,
     FeedPagination,
+    PostLikedUserPagination,
 )
 from .permissions import IsOwnerOrAdmin
 from .tasks import delete_item, send_item_like_notification, create_hashtags
@@ -67,6 +69,16 @@ class ItemCreateView(APIView):
 
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateEngagementCounterView(APIView):
+    def patch(self, *args, **kwargs):
+        post_id = self.request.data.get("postId")
+        instance = Item.objects.get(id=post_id)
+        instance.engagement_counter = F("engagement_counter") + 1
+        instance.save()
+        print(instance.engagement_counter)
+        return Response(status=status.HTTP_201_CREATED)
 
 
 class FeedItemsListView(generics.ListAPIView):
@@ -203,6 +215,23 @@ class ItemDeleteView(APIView):
         item_id = request.query_params.get("post_id")
         delete_item.delay(item_id)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ItemLikedUsersView(generics.ListAPIView):
+    pagination_class = PostLikedUserPagination
+
+    def get_queryset(self):
+        post_id = self.request.query_params.get("postId")
+        item_instance = Item.objects.get(id=post_id)
+        queryset = Like.objects.filter(item=item_instance)
+        return queryset
+
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        return serializer_class(*args, **kwargs)
+
+    def get_serializer_class(self):
+        return ItemLikedUserSerializer
 
 
 class ReportItemView(APIView):

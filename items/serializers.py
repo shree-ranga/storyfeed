@@ -33,6 +33,15 @@ class ItemCreateSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
+class ItemLikedUserSerializer(serializers.ModelSerializer):
+    user = UserListSerializer()
+
+    class Meta:
+        model = Like
+        fields = ["user"]
+        read_only_fields = ["user"]
+
+
 class ItemListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
@@ -42,6 +51,7 @@ class ItemListSerializer(serializers.ModelSerializer):
 
 class ItemDetailSerializer(serializers.ModelSerializer):
     user = UserListSerializer()
+    single_liked_user = ItemLikedUserSerializer()
 
     class Meta:
         model = Item
@@ -53,8 +63,17 @@ class ItemDetailSerializer(serializers.ModelSerializer):
             "audio_url",
             "caption",
             "created_at",
+            "engagement_counter",
+            "single_liked_user",
+            "is_more_than_one_like",
         ]
-        read_only_fields = ["id", "user"]
+        read_only_fields = [
+            "id",
+            "user",
+            "engagement_counter",
+            "single_liked_user",
+            "is_more_than_one_like",
+        ]
 
 
 class ItemCommentListSerializer(serializers.ModelSerializer):

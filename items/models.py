@@ -28,6 +28,18 @@ class Item(models.Model):
         return self.item_like.count()
 
     @property
+    def single_liked_user(self):
+        if self.item_like.count() > 0:
+            return self.item_like.first()
+
+    @property
+    def is_more_than_one_like(self):
+        if self.item_like.count() > 1:
+            return True
+        else:
+            return False
+
+    @property
     def total_comments(self):
         return self.item_comments.count()
 
