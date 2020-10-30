@@ -75,6 +75,7 @@ def create_hashtags(item_id, hashtags):
             tag_instance, created = HashTag.objects.get_or_create(hashtag=word)
             tag_instance.items.add(i)
             tag_instance.save()
+            print(tag_instance)
 
     except Exception as e:
         print(e)
