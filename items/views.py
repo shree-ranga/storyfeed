@@ -42,6 +42,8 @@ class ItemCreateView(APIView):
         video_url = request.data.get("video_url")
         audio_url = request.data.get("audio_url")
         expiration_time = request.data.get("expiry_time")
+        if expiration_time == "1 year":
+            expiration_time = 365
         caption = request.data.get("caption")
         hashTags = request.data.get("hashTags")
         data = {
