@@ -61,12 +61,11 @@ class ItemCreateView(APIView):
             )
             delete_item.apply_async(args=(serializer.instance.id,), eta=delete_eta)
 
-            # if hashTags:
-            #     create_hashtags.delay(
-            #         serializer.instance.id,
-            #         hashTags,
-            #     )
-
+            if hashTags:
+                create_hashtags.delay(
+                    serializer.instance.id,
+                    hashTags,
+                )
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
