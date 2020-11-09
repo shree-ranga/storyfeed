@@ -52,6 +52,7 @@ class ItemListSerializer(serializers.ModelSerializer):
 class ItemDetailSerializer(serializers.ModelSerializer):
     user = UserListSerializer()
     single_liked_user = ItemLikedUserSerializer()
+    comments_count = serializers.ReadOnlyField(source="total_comments")
 
     class Meta:
         model = Item
@@ -66,6 +67,7 @@ class ItemDetailSerializer(serializers.ModelSerializer):
             "engagement_counter",
             "single_liked_user",
             "is_more_than_one_like",
+            "comments_count",
         ]
         read_only_fields = [
             "id",

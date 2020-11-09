@@ -3,7 +3,7 @@ import json
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
-from celery import shared_task
+from storyboard.celery import celery_app
 
 from push_notifications.models import APNSDevice
 
@@ -21,7 +21,7 @@ User = get_user_model()
 # r = redis.StrictRedis(db=1, decode_responses=True)
 
 
-@shared_task
+@celery_app.task
 def send_item_like_notification(receiver_id, sender_id):
     try:
         devices = APNSDevice.objects.filter(user=receiver_id)
@@ -65,7 +65,7 @@ def send_item_like_notification(receiver_id, sender_id):
 #         pass
 
 
-@shared_task
+@celery_app.task
 def create_hashtags(item_id, hashtags):
     try:
         i = Item.objects.get(id=item_id)
@@ -82,7 +82,7 @@ def create_hashtags(item_id, hashtags):
 
 
 # TODO: - move this inside model
-@shared_task
+@celery_app.task
 def delete_item(item_id):
     try:
         i = Item.objects.get(id=item_id)

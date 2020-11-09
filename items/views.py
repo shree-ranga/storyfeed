@@ -87,7 +87,26 @@ class FeedItemsListView(generics.ListAPIView):
         user = self.request.user
         following_ids = list(user.profile.following.all().values_list(flat=True))
         following_ids.append(user.id)
-        queryset = Item.objects.filter(user__in=following_ids)
+        queryset = Item.objects.filter(user__in=following_ids, expiry_time__gt=1)
+        return queryset
+
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        return serializer_class(*args, **kwargs)
+
+    def get_serializer_class(self):
+        return ItemDetailSerializer
+
+
+class StoryItemListView(generics.ListAPIView):
+    pagination_class = FeedPagination
+
+    def get_queryset(self):
+        user = self.request.user
+        following_ids = list(user.profile.following.all().values_list(flat=True))
+        following_ids.append(user.id)
+        queryset = Item.objects.filter(user__in=following_ids, expiry_time=1)
+        # queryset = queryset.filter(expiry_time=1)
         return queryset
 
     def get_serializer(self, *args, **kwargs):

@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.core.files.storage import default_storage
 from django.conf import settings
 
-from celery import shared_task
+from storyboard.celery import celery_app
 
 from push_notifications.models import APNSDevice
 
@@ -17,7 +17,7 @@ from notifications.models import Notification
 User = get_user_model()
 
 
-@shared_task
+@celery_app.task
 def process_avatar_image(user_id):
     try:
         memfile = BytesIO()
@@ -46,7 +46,7 @@ def process_avatar_image(user_id):
         print(e)
 
 
-@shared_task
+@celery_app.task
 def send_follow_push_notification(receiver_id, sender_id):
     try:
         devices = APNSDevice.objects.filter(user=receiver_id)
@@ -63,7 +63,7 @@ def send_follow_push_notification(receiver_id, sender_id):
     devices.send_message(message={"body": msg}, badge=badge_count)
 
 
-@shared_task
+@celery_app.task
 def delete_reported_user(id):
     try:
         u = User.objects.get(id=id)
@@ -72,7 +72,7 @@ def delete_reported_user(id):
         pass
 
 
-@shared_task
+@celery_app.task
 def delete_profile_avatar(user_id):
     try:
         user = User.objects.get(id=user_id)

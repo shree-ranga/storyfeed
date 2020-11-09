@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 
-from celery import shared_task
+from storyboard.celery import celery_app
 
 from push_notifications.models import APNSDevice
 
@@ -9,7 +9,7 @@ from notifications.models import Notification
 User = get_user_model()
 
 
-@shared_task
+@celery_app.task
 def send_comment_notification(receiver_id, sender_id, comment):
     try:
         devices = APNSDevice.objects.filter(user=receiver_id)
