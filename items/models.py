@@ -15,10 +15,10 @@ class Item(models.Model):
     caption = models.CharField(max_length=100, null=True, blank=True)
     is_private = models.BooleanField(default=False)
     expiry_time = models.PositiveIntegerField(default=1)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     engagement_counter = models.PositiveIntegerField(default=0)
     report_counter = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ("-created_at",)
@@ -52,8 +52,8 @@ class Like(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="liked_by"
     )
-    created_at = models.DateTimeField(auto_now_add=True)
     notifications = GenericRelation(Notification)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ("item", "user")

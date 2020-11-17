@@ -42,6 +42,13 @@ class ItemLikedUserSerializer(serializers.ModelSerializer):
         read_only_fields = ["user"]
 
 
+class HashTagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HashTag
+        fields = ["id", "hashtag"]
+        read_only_fields = ["id"]
+
+
 class ItemListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
@@ -52,6 +59,7 @@ class ItemListSerializer(serializers.ModelSerializer):
 class ItemDetailSerializer(serializers.ModelSerializer):
     user = UserListSerializer()
     single_liked_user = ItemLikedUserSerializer()
+    hashtags = HashTagSerializer(many=True)
     comments_count = serializers.ReadOnlyField(source="total_comments")
 
     class Meta:
@@ -63,6 +71,7 @@ class ItemDetailSerializer(serializers.ModelSerializer):
             "video_url",
             "audio_url",
             "caption",
+            "hashtags",
             "created_at",
             "engagement_counter",
             "single_liked_user",
@@ -75,6 +84,7 @@ class ItemDetailSerializer(serializers.ModelSerializer):
             "engagement_counter",
             "single_liked_user",
             "is_more_than_one_like",
+            "hashtags",
         ]
 
 
@@ -121,10 +131,3 @@ class LikeNotificationSerializer(serializers.ModelSerializer):
         model = Like
         fields = ["id", "item"]
         read_only_fields = ["id", "item"]
-
-
-# class HashTagSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = HashTag
-#         fields = "__all__"
-#         read_only_fields = ["id"]
