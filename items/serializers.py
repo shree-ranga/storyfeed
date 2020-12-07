@@ -61,6 +61,7 @@ class ItemDetailSerializer(serializers.ModelSerializer):
     single_liked_user = ItemLikedUserSerializer()
     hashtags = HashTagSerializer(many=True)
     comments_count = serializers.ReadOnlyField(source="total_comments")
+    likes_count = serializers.ReadOnlyField(source="total_likes")
 
     class Meta:
         model = Item
@@ -77,6 +78,7 @@ class ItemDetailSerializer(serializers.ModelSerializer):
             "single_liked_user",
             "is_more_than_one_like",
             "comments_count",
+            "likes_count",
         ]
         read_only_fields = [
             "id",
