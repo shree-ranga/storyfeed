@@ -14,7 +14,7 @@ class Item(models.Model):
     audio_url = models.CharField(max_length=300, null=True, blank=True)
     caption = models.CharField(max_length=100, null=True, blank=True)
     is_private = models.BooleanField(default=False)
-    expiry_time = models.PositiveIntegerField(default=1)
+    expiry_time = models.PositiveIntegerField(default=1, null=True)
     engagement_counter = models.PositiveIntegerField(default=0)
     report_counter = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
