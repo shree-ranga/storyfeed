@@ -44,16 +44,24 @@ class ItemCreateView(APIView):
         # expiration_time = request.data.get("expiry_time")
         # if expiration_time == "1 year":
         #     expiration_time = 365
+        status_text = request.data.get("status_text")
+        status_red = request.data.get("status_red")
+        status_green = request.data.get("status_green")
+        status_blue = request.data.get("status_blue")
         caption = request.data.get("caption")
         hashTags = request.data.get("hashTags")
+        print(type(hashTags))
         data = {
             "item": item,
             "video_url": video_url,
             "audio_url": audio_url,
             # "expiry_time": int(expiration_time),
             "caption": caption,
+            "status_text": status_text,
+            "status_red": status_red,
+            "status_green": status_green,
+            "status_blue": status_blue,
         }
-
         serializer = ItemCreateSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)

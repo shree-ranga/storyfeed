@@ -24,6 +24,7 @@ class Profile(models.Model):
     )
     total_likes = models.PositiveIntegerField(default=0)
     is_private = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
     blocked_profiles = models.ManyToManyField(
         settings.AUTH_USER_MODEL, symmetrical=False, related_name="blocked_by"
     )

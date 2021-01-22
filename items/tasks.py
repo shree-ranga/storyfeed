@@ -69,8 +69,13 @@ def send_item_like_notification(receiver_id, sender_id):
 def create_hashtags(item_id, hashtags):
     try:
         i = Item.objects.get(id=item_id)
-        h = json.loads(hashtags)
-        words = h["hashTags"]
+        if isinstance(hashtags, str):
+            h = json.loads(hashtags)
+            words = h["hashTags"]
+
+        if isinstance(hashtags, list):
+            words = hashtags
+
         for word in words:
             tag_instance, created = HashTag.objects.get_or_create(hashtag=word)
             tag_instance.items.add(i)
