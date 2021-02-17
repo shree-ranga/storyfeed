@@ -25,14 +25,12 @@ class ItemCreateSerializer(serializers.ModelSerializer):
             "item",
             "video_url",
             "audio_url",
-            "expiry_time",
             "status_text",
             "status_red",
             "status_green",
             "status_blue",
             "caption",
             "engagement_counter",
-            "is_private",
         ]
         read_only_fields = ["id"]
 
@@ -58,6 +56,15 @@ class ItemListSerializer(serializers.ModelSerializer):
         model = Item
         fields = ["id", "item", "engagement_counter"]
         read_only_fields = ["id", "engagement_counter"]
+
+
+class FeedItemUserListSerializer(serializers.ModelSerializer):
+    user = UserListSerializer()
+
+    class Meta:
+        model = Item
+        fields = ["id", "user"]
+        read_only_fields = ["id", "user"]
 
 
 class ItemDetailSerializer(serializers.ModelSerializer):

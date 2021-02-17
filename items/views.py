@@ -18,6 +18,7 @@ from .serializers import (
     ItemCreateSerializer,
     ItemListSerializer,
     ItemDetailSerializer,
+    FeedItemUserListSerializer,
     LikeSerializer,
     ItemLikedUserSerializer,
 )
@@ -41,35 +42,30 @@ class ItemCreateView(APIView):
         item = request.data.get("item")
         video_url = request.data.get("video_url")
         audio_url = request.data.get("audio_url")
-        # expiration_time = request.data.get("expiry_time")
-        # if expiration_time == "1 year":
-        #     expiration_time = 365
         status_text = request.data.get("status_text")
         status_red = request.data.get("status_red")
         status_green = request.data.get("status_green")
         status_blue = request.data.get("status_blue")
         caption = request.data.get("caption")
         hashTags = request.data.get("hashTags")
-        print(type(hashTags))
         data = {
             "item": item,
             "video_url": video_url,
             "audio_url": audio_url,
-            # "expiry_time": int(expiration_time),
             "caption": caption,
             "status_text": status_text,
             "status_red": status_red,
             "status_green": status_green,
             "status_blue": status_blue,
         }
+
         serializer = ItemCreateSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)
 
-            # delete_eta = serializer.instance.created_at + datetime.timedelta(
-            #     days=serializer.instance.expiry_time
-            # )
-            # delete_item.apply_async(args=(serializer.instance.id,), eta=delete_eta)
+            # celery tasks
+            delete_eta = serializer.instance.created_at + datetime.timedelta(days=7)
+            delete_item.apply_async(args=(serializer.instance.id,), eta=delete_eta)
 
             if hashTags is not None:
                 create_hashtags.apply_async((serializer.instance.id, hashTags))
@@ -84,7 +80,6 @@ class UpdateEngagementCounterView(APIView):
         instance = Item.objects.get(id=post_id)
         instance.engagement_counter = F("engagement_counter") + 1
         instance.save()
-        print(instance.engagement_counter)
         return Response(status=status.HTTP_201_CREATED)
 
 
@@ -95,7 +90,13 @@ class FeedItemsListView(generics.ListAPIView):
         user = self.request.user
         following_ids = list(user.profile.following.all().values_list(flat=True))
         following_ids.append(user.id)
-        queryset = Item.objects.filter(user__in=following_ids)
+        q = (
+            Item.objects.filter(user__in=following_ids)
+            .order_by("user", "-created_at")
+            .distinct("user")
+            .values_list("id", flat=True)
+        )
+        queryset = Item.objects.filter(id__in=q)
         return queryset
 
     def get_serializer(self, *args, **kwargs):
@@ -103,26 +104,7 @@ class FeedItemsListView(generics.ListAPIView):
         return serializer_class(*args, **kwargs)
 
     def get_serializer_class(self):
-        return ItemDetailSerializer
-
-
-# class StoryItemListView(generics.ListAPIView):
-#     pagination_class = FeedPagination
-
-#     def get_queryset(self):
-#         user = self.request.user
-#         following_ids = list(user.profile.following.all().values_list(flat=True))
-#         following_ids.append(user.id)
-#         queryset = Item.objects.filter(user__in=following_ids, expiry_time=1)
-#         # queryset = queryset.filter(expiry_time=1)
-#         return queryset
-
-#     def get_serializer(self, *args, **kwargs):
-#         serializer_class = self.get_serializer_class()
-#         return serializer_class(*args, **kwargs)
-
-#     def get_serializer_class(self):
-#         return ItemDetailSerializer
+        return FeedItemUserListSerializer
 
 
 class ProfileItemListView(generics.ListAPIView):

@@ -17,11 +17,12 @@ class Item(models.Model):
     status_green = models.CharField(max_length=50, null=True, blank=True)
     status_blue = models.CharField(max_length=50, null=True, blank=True)
     caption = models.CharField(max_length=100, null=True, blank=True)
-    is_private = models.BooleanField(default=False)
-    expiry_time = models.PositiveIntegerField(default=1, null=True)
+    is_archived = models.BooleanField(default=False)
+    is_expired = models.BooleanField(default=False)
+    # expiry_time = models.PositiveIntegerField(default=7, null=True)
     engagement_counter = models.PositiveIntegerField(default=0)
     report_counter = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
