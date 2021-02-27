@@ -41,7 +41,7 @@ class Profile(models.Model):
 
     @property
     def items_count(self):
-        return self.user.items.count()
+        return self.total_likes
 
     def __str__(self):
         return f"{self.user.username}'s profile"
