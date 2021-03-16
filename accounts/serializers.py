@@ -25,11 +25,11 @@ class ProfilePicSerializer(serializers.ModelSerializer):
 
 class UserListSerializer(serializers.ModelSerializer):
     profile = ProfilePicSerializer(required=False, many=False)
-    total_items = serializers.ReadOnlyField(source="items_count")
+    # total_items = serializers.ReadOnlyField(source="items_count")
 
     class Meta:
         model = User
-        fields = ["id", "username", "full_name", "total_items", "profile"]
+        fields = ["id", "username", "full_name", "profile"]
         read_only_fields = ["id"]
 
 
