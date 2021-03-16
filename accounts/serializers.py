@@ -25,7 +25,6 @@ class ProfilePicSerializer(serializers.ModelSerializer):
 
 class UserListSerializer(serializers.ModelSerializer):
     profile = ProfilePicSerializer(required=False, many=False)
-    # total_items = serializers.ReadOnlyField(source="items_count")
 
     class Meta:
         model = User
@@ -36,7 +35,7 @@ class UserListSerializer(serializers.ModelSerializer):
 class ProfileDetailSerializer(serializers.ModelSerializer):
     total_followers = serializers.ReadOnlyField(source="followers_count")
     total_following = serializers.ReadOnlyField(source="following_count")
-    total_likes = serializers.ReadOnlyField(source="total_likes")
+    total_likes = serializers.ReadOnlyField(source="item_likes")
     profileavatar = ProfileAvatarSerializer(required=False, many=False)
 
     class Meta:

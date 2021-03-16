@@ -40,12 +40,8 @@ class Profile(models.Model):
         return self.following.count()
 
     @property
-    def total_likes(self):
+    def item_likes(self):
         return self.total_likes
-
-    @property
-    def items_count(self):
-        return self.user.items.count()
 
     def __str__(self):
         return f"{self.user.username}'s profile"
